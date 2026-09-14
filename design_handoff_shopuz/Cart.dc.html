@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+</helmet>
+<div style="background:var(--bg);min-width:0;min-height:100%">
+  <dc-import name="StoreNav" active="" cart-count="2" hint-size="100%,84px"></dc-import>
+
+  <div style="max-width:1180px;margin:0 auto;padding:44px 30px">
+    <div style="text-align:center;margin-bottom:36px">
+      <h1 style="font-size:clamp(30px,4.4vw,46px)">{{ title }}</h1>
+      <p class="muted" style="font-size:13.5px;margin-top:8px">{{ countLabel }}</p>
+    </div>
+
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center;padding:40px 0 80px;display:flex;flex-direction:column;align-items:center;gap:18px">
+        <span style="display:grid;place-items:center;width:80px;height:80px;border-radius:50%;background:var(--bg-2);color:var(--ink-soft)"><svg width="38" height="38" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="14" stroke-linejoin="round"><path d="M56 72h144l-11 128a16 16 0 0 1-16 15H83a16 16 0 0 1-16-15Z"/><path d="M88 96V72a40 40 0 0 1 80 0v24"/></svg></span>
+        <p style="font-size:16px;color:var(--ink-2)">{{ emptyText }}</p>
+        <a href="Catalog.dc.html" class="btn btn-primary">{{ emptyBtn }}</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasItems }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;gap:44px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:2 1 440px;min-width:0">
+          <sc-for list="{{ items }}" as="it" hint-placeholder-count="2">
+            <div style="display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:18px 0;border-bottom:1px solid var(--line)">
+              <div style="width:78px;flex:none;aspect-ratio:3/4;background:var(--tile);overflow:hidden;border-radius:var(--r-sm)">
+                <sc-if value="{{ it.img }}" hint-placeholder-val="{{ false }}"><img src="{{ it.img }}" alt="{{ it.title }}" style="width:100%;height:100%;object-fit:cover"></sc-if>
+              </div>
+              <div style="min-width:0">
+                <div style="font-size:14.5px;margin-bottom:4px">{{ it.title }}</div>
+                <sc-if value="{{ it.sizeText }}" hint-placeholder-val="{{ false }}"><div class="muted" style="font-size:12px;margin-bottom:8px">{{ it.sizeText }}</div></sc-if>
+                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                  <div style="display:flex;align-items:center;border:1px solid var(--line-2)">
+                    <button onClick="{{ it.dec }}" class="btn-ghost" style="padding:6px 12px;color:var(--ink-2);border:none;background:none;cursor:pointer">−</button>
+                    <span style="min-width:28px;text-align:center;font-size:14px">{{ it.qty }}</span>
+                    <button onClick="{{ it.inc }}" class="btn-ghost" style="padding:6px 12px;color:var(--ink-2);border:none;background:none;cursor:pointer">+</button>
+                  </div>
+                  <span style="font-family:var(--sans);font-weight:500;font-size:14.5px">{{ it.lineTotal }}</span>
+                </div>
+              </div>
+              <button onClick="{{ it.remove }}" class="btn-ghost muted" aria-label="O'chirish" style="padding:0;border:none;background:none;cursor:pointer;align-self:flex-start"><svg width="17" height="17" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"><line x1="200" y1="56" x2="56" y2="200"/><line x1="200" y1="200" x2="56" y2="56"/></svg></button>
+            </div>
+          </sc-for>
+          <a href="Catalog.dc.html" class="ulink" style="margin-top:24px;border-bottom-width:1px">← {{ continueShopping }}</a>
+        </div>
+
+        <aside style="flex:1 1 300px;max-width:360px;min-width:280px;position:sticky;top:104px">
+          <div style="background:var(--bg-2);padding:28px;display:flex;flex-direction:column;gap:16px">
+            <h3 style="font-size:19px;font-family:var(--sans);font-weight:700">{{ summaryTitle }}</h3>
+            <div style="display:flex;flex-direction:column;gap:12px;font-size:14px">
+              <div style="display:flex;justify-content:space-between"><span class="muted">{{ subtotalLabel }}</span><span>{{ subtotalStr }}</span></div>
+              <div style="display:flex;justify-content:space-between"><span class="muted">{{ deliveryLabel }}</span><span>{{ deliveryStr }}</span></div>
+            </div>
+            <div style="height:1px;background:var(--line-2)"></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font-size:15px">{{ totalLabel }}</span>
+              <span style="font-family:var(--serif);font-weight:500;font-size:26px">{{ totalStr }} <span style="font-size:14px;font-family:var(--sans)">{{ som }}</span></span>
+            </div>
+            <a href="#" class="btn btn-primary btn-block" style="padding:16px">{{ checkoutBtn }}</a>
+            <p class="muted" style="font-size:11.5px;text-align:center;line-height:1.6">{{ note }}</p>
+          </div>
+        </aside>
+      </div>
+    </sc-if>
+  </div>
+
+  <dc-import name="StoreFooter" hint-size="100%,260px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  readCart() { try { return JSON.parse(localStorage.getItem("suf_cart") || "[]"); } catch (e) { return []; } }
+  writeCart(c) { try { localStorage.setItem("suf_cart", JSON.stringify(c)); } catch (e) {} window.dispatchEvent(new CustomEvent("suf-cart")); this.forceUpdate(); }
+  componentDidMount() {
+    this._lh = () => this.forceUpdate();
+    window.addEventListener("suf-lang", this._lh);
+    window.addEventListener("suf-cart", this._lh);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("suf-lang", this._lh);
+    window.removeEventListener("suf-cart", this._lh);
+  }
+  fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+  renderVals() {
+    const R = this.lang() === "ru";
+    const cur = R ? "сум" : "so'm";
+    const cart = this.readCart();
+    const setQty = (key, d) => {
+      const c = this.readCart();
+      const it = c.find((x) => x.key === key);
+      if (!it) return;
+      it.qty += d;
+      const next = c.filter((x) => x.qty > 0);
+      this.writeCart(next);
+    };
+    const remove = (key) => this.writeCart(this.readCart().filter((x) => x.key !== key));
+    const totalQty = cart.reduce((s, x) => s + x.qty, 0);
+    const subtotal = cart.reduce((s, x) => s + x.price * x.qty, 0);
+    const delivery = cart.length ? 30000 : 0;
+    return {
+      title: R ? "Корзина" : "Savat",
+      countLabel: R ? totalQty + " товаров" : totalQty + " ta mahsulot",
+      isEmpty: cart.length === 0,
+      hasItems: cart.length > 0,
+      emptyText: R ? "Ваша корзина пуста" : "Savatingiz bo'sh",
+      emptyBtn: R ? "Перейти к покупкам" : "Xaridga o'tish",
+      continueShopping: R ? "Продолжить покупки" : "Xaridni davom ettirish",
+      summaryTitle: R ? "Итог заказа" : "Buyurtma xulosasi",
+      subtotalLabel: R ? "Товары (" + totalQty + ")" : "Mahsulotlar (" + totalQty + ")",
+      subtotalStr: this.fmt(subtotal) + " " + cur,
+      deliveryLabel: R ? "Доставка (Ташкент)" : "Yetkazish (Toshkent)",
+      deliveryStr: delivery ? this.fmt(delivery) + " " + cur : "—",
+      totalLabel: R ? "Итого" : "Jami",
+      totalStr: this.fmt(subtotal + delivery),
+      som: cur,
+      checkoutBtn: R ? "Оформить заказ" : "Rasmiylashtirish",
+      note: R ? "Для оформления заказа требуется вход. Корзина сохранится." : "Buyurtma berish uchun tizimga kirish talab qilinadi. Savat saqlanadi.",
+      items: cart.map((it) => ({
+        title: it.title,
+        img: it.img || "",
+        sizeText: it.size ? (R ? "Размер: " : "O'lcham: ") + it.size : (it.sub || ""),
+        qty: it.qty,
+        lineTotal: this.fmt(it.price * it.qty) + " " + cur,
+        inc: () => setQty(it.key, 1),
+        dec: () => setQty(it.key, -1),
+        remove: () => remove(it.key),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

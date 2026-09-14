@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+<script src="./image-slot.js"></script>
+<style>
+@keyframes cbBgShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+</style>
+</helmet>
+<div style="background:var(--bg);min-width:0">
+  <dc-import name="StoreNav" active="" cart-count="2" hint-size="100%,84px"></dc-import>
+
+  <section style="max-width:1280px;margin:0 auto;padding:24px 30px 0">
+    <div style="border-radius:var(--r);background:linear-gradient(115deg,#1C1C1C 0%,#3A2E2A 40%,#5A3B36 60%,#1C1C1C 100%);background-size:300% 300%;animation:cbBgShift 14s ease infinite;color:#fff;padding:clamp(28px,5%,52px);text-align:center">
+      <span style="font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)">{{ kicker }}</span>
+      <h1 style="color:#fff;font-size:clamp(28px,4vw,48px);margin:12px 0 8px">{{ title }}</h1>
+      <p style="color:rgba(255,255,255,.82);font-size:14.5px;max-width:52ch;margin:0 auto;line-height:1.6">{{ subtitle }}</p>
+    </div>
+  </section>
+
+  <div style="max-width:1280px;margin:0 auto;padding:34px 30px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:26px 22px">
+      <sc-for list="{{ products }}" as="p" hint-placeholder-count="1">
+        <dc-import name="ProductCard" slot-id="{{ p.id }}" img="{{ p.img }}" title="{{ p.title }}" price="{{ p.price }}" old-price="{{ p.oldPrice }}" rating="{{ p.rating }}" tags="{{ p.tags }}" color-dots="{{ p.colors }}" size-label="{{ p.sizeLabel }}" sizes="{{ p.sizes }}" tall="{{ p.tall }}" decant="{{ p.decant }}" hint-size="100%,560px"></dc-import>
+      </sc-for>
+    </div>
+  </div>
+
+  <dc-import name="StoreFooter" hint-size="100%,260px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  renderVals() {
+    const R = this.lang() === "ru";
+    const P = (uz, ru) => (R ? ru : uz);
+    return {
+      kicker: R ? "Специальные цены" : "Maxsus narxlar",
+      title: R ? "Товары со скидкой" : "Chegirmadagi mahsulotlar",
+      subtitle: R ? "Скидки на выбранные товары из Турции. Количество ограничено." : "Turkiyadan kelgan tanlangan mahsulotlarga chegirma. Miqdor cheklangan.",
+      products: [
+        { id: "sale-ch1", img: "assets/marca-giovanni.jpg", title: "Marca Giovanni", sizeLabel: P("Turkiya · Qutisiz · Ko'rpajild 200/220, prostinya 240/260, 2 yostiqjild 50/70", "Турция · Без коробки · Пододеяльник 200/220, простыня 240/260, 2 наволочки 50/70"), price: "600 000", oldPrice: "900 000", rating: 5, tags: [{ label: "-30%", type: "sale" }, { label: R ? "Осталось 1 шт" : "1 dona qoldi", type: "hot" }], colors: ["#1C1C1C", "#C0392B"] },
+        { id: "sale-p2", img: "assets/sharmiel.jpg", title: "Şarmiel", sizeLabel: P("O'lcham: 40 · faqat 1 dona", "Размер: 40 · только 1 шт"), price: "150 000", oldPrice: "214 000", rating: 5, tags: [{ label: "-30%", type: "sale" }, { label: R ? "Осталось 1 шт" : "1 dona qoldi", type: "hot" }], colors: [] },
+        { id: "sale-l4", img: "assets/daffic.jpg", title: "Daffic", tall: true, sizes: ["42"], price: "630 000", oldPrice: "700 000", rating: 5, tags: [{ label: "-10%", type: "sale" }], colors: [] },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+<script src="./image-slot.js"></script>
+</helmet>
+<div style="background:var(--bg);min-width:0">
+  <dc-import name="StoreNav" active="" cart-count="2" hint-size="100%,84px"></dc-import>
+
+  <div style="background:var(--bg-2);border-bottom:1px solid var(--line)">
+    <div style="max-width:1280px;margin:0 auto;padding:44px 30px;text-align:center">
+      <span class="kicker">{{ kicker }}</span>
+      <h1 style="font-size:clamp(30px,4.4vw,46px);margin-top:10px">{{ title }}</h1>
+      <p class="muted" style="font-size:13.5px;margin-top:8px">{{ subtitle }}</p>
+    </div>
+  </div>
+
+  <div style="max-width:1280px;margin:0 auto;padding:34px 30px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;align-items:start">
+
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div style="border:1px solid var(--line);padding:24px;display:flex;gap:16px;align-items:flex-start">
+          <span style="display:grid;place-items:center;width:46px;height:46px;flex:none;border-radius:50%;background:var(--accent-100);color:var(--accent)"><svg width="22" height="22" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linejoin="round"><path d="M128 24a80 80 0 0 0-80 80c0 68 80 128 80 128s80-60 80-128a80 80 0 0 0-80-80Z"/><circle cx="128" cy="104" r="28"/></svg></span>
+          <div>
+            <h3 style="font-size:19px;font-family:var(--sans);font-weight:600;margin-bottom:6px">{{ addrHead }}</h3>
+            <p style="font-size:14.5px;color:var(--ink-2);line-height:1.7">{{ addrLine }}</p>
+            <p class="muted" style="font-size:12.5px;margin-top:8px;line-height:1.6">{{ addrHint }}</p>
+          </div>
+        </div>
+
+        <div style="border:1px solid var(--line);padding:24px;display:flex;gap:16px;align-items:flex-start">
+          <span style="display:grid;place-items:center;width:46px;height:46px;flex:none;border-radius:50%;background:var(--accent-100);color:var(--accent)"><svg width="22" height="22" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round"><circle cx="128" cy="128" r="96"/><polyline points="128 72 128 128 168 152"/></svg></span>
+          <div>
+            <h3 style="font-size:19px;font-family:var(--sans);font-weight:600;margin-bottom:10px">{{ hoursHead }}</h3>
+            <div style="display:flex;justify-content:space-between;gap:16px;font-size:14.5px;color:var(--ink-2);padding-bottom:8px">
+              <span>{{ daysLabel }}</span><span style="font-weight:600;color:var(--ink)">10:00 – 22:00</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--accent);margin-top:6px"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></span>{{ openNow }}</div>
+          </div>
+        </div>
+
+        <div style="border:1px solid var(--line);padding:24px;display:flex;gap:16px;align-items:flex-start">
+          <span style="display:grid;place-items:center;width:46px;height:46px;flex:none;border-radius:50%;background:var(--accent-100);color:var(--accent)"><svg width="22" height="22" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linejoin="round"><path d="M92 60l16 40-24 16a72 72 0 0 0 36 36l16-24 40 16v36a16 16 0 0 1-16 16A136 136 0 0 1 40 72a16 16 0 0 1 16-16Z"/></svg></span>
+          <div style="min-width:0">
+            <h3 style="font-size:19px;font-family:var(--sans);font-weight:600;margin-bottom:6px">{{ contactHead }}</h3>
+            <p style="font-size:14.5px;color:var(--ink-2);margin-bottom:2px">{{ adminName }}</p>
+            <a href="tel:+998911919178" style="font-family:var(--serif);font-size:24px;color:var(--ink)">+998 91 191 91 78</a>
+            <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+              <a href="tel:+998911919178" class="btn btn-primary" style="gap:8px"><svg width="16" height="16" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linejoin="round"><path d="M92 60l16 40-24 16a72 72 0 0 0 36 36l16-24 40 16v36a16 16 0 0 1-16 16A136 136 0 0 1 40 72a16 16 0 0 1 16-16Z"/></svg>{{ callBtn }}</a>
+              <a href="https://t.me/ShopuzFeruza" target="_blank" rel="noopener" class="btn btn-secondary" style="gap:8px"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M228 44 26 122c-11 4-11 19 0 23l52 18 18 55c3 10 16 12 23 3l26-31 45 33c8 6 20 2 22-8l30-160c3-12-9-22-20-16Z"/></svg>Telegram</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="position:relative;border:1px solid var(--line);overflow:hidden;aspect-ratio:4/3;background:var(--tile)">
+          <image-slot id="aloqa-map" shape="rect" fit="cover" placeholder="Xarita skrinshoti (ixtiyoriy)"></image-slot>
+          <div style="position:absolute;left:16px;top:16px;background:#fff;box-shadow:var(--sh-sm);padding:8px 12px;font-size:12.5px;display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:var(--sale)"></span>ShopUzFeruzaxon</div>
+        </div>
+        <a href="https://yandex.uz/maps/?text=ShopUzFeruzaxon" target="_blank" rel="noopener" class="btn btn-primary btn-block" style="padding:15px;gap:9px"><svg width="17" height="17" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linejoin="round"><path d="M128 24a80 80 0 0 0-80 80c0 68 80 128 80 128s80-60 80-128a80 80 0 0 0-80-80Z"/><circle cx="128" cy="104" r="28"/></svg>{{ mapBtn }}</a>
+        <p class="muted" style="font-size:12px;text-align:center;line-height:1.6">{{ mapHint }}</p>
+      </div>
+
+    </div>
+  </div>
+
+  <dc-import name="StoreFooter" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  renderVals() {
+    const R = this.lang() === "ru";
+    return {
+      kicker: R ? "Контакты" : "Aloqa",
+      title: R ? "Адрес и часы работы" : "Manzil va ish vaqti",
+      subtitle: R ? "Приходите в магазин или свяжитесь с нами" : "Do'konimizga tashrif buyuring yoki biz bilan bog'laning",
+      addrHead: R ? "Адрес магазина" : "Do'kon manzili",
+      addrLine: R ? "г. Ташкент, Чиланзарский район, дом 3" : "Toshkent shahar, Chilonzor tumani, 3-uy",
+      addrHint: R ? "В Яндекс Навигаторе наберите «ShopUzFeruzaxon» — магазин появится на карте." : "Yandex Navigatorda «ShopUzFeruzaxon» deb yozsangiz — do'kon xaritada chiqadi.",
+      hoursHead: R ? "Часы работы" : "Ish vaqti",
+      daysLabel: R ? "Понедельник – Суббота" : "Dushanba – Shanba",
+      openNow: R ? "Сейчас открыто" : "Hozir ochiq",
+      contactHead: R ? "Связь" : "Bog'lanish",
+      adminName: R ? "Администратор: Феруза" : "Administrator: Feruza",
+      callBtn: R ? "Позвонить" : "Qo'ng'iroq qilish",
+      mapBtn: R ? "Открыть в Яндекс Картах" : "Yandex Xaritada ochish",
+      mapHint: R ? "Откроется поиск «ShopUzFeruzaxon» в Яндекс Картах." : "«ShopUzFeruzaxon» Yandex Xaritada qidiruv sifatida ochiladi.",
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+<script src="./image-slot.js"></script>
+<style>
+@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.12); } }
+@keyframes heroSweep { 0% { transform: translateX(-130%) skewX(-12deg); } 55% { transform: translateX(130%) skewX(-12deg); } 100% { transform: translateX(130%) skewX(-12deg); } }
+@keyframes heroGlow { 0%,100% { opacity: .25; } 50% { opacity: .5; } }
+@media (max-width:760px){
+  .home-3tile{ grid-template-columns:1fr !important; }
+  .home-3tile > a{ min-height:200px !important; }
+  .home-sec{ padding-left:16px !important; padding-right:16px !important; }
+  .home-hero-wrap{ min-height:600px !important; }
+  .home-hero-text{ max-width:100% !important; padding:22px !important; }
+  .home-hero-img{ min-height:230px !important; height:auto !important; }
+  .promo-txt{ max-width:60% !important; padding:22px !important; }
+  .promo-img{ width:44% !important; }
+}
+@media (max-width:460px){
+  .home-hero-wrap{ min-height:560px !important; }
+  .home-hero-arrow{ display:none !important; }
+}
+</style>
+</helmet>
+<div style="background:var(--bg);min-width:0">
+  <dc-import name="StoreNav" active="Bosh sahifa" cart-count="2" hint-size="100%,84px"></dc-import>
+
+  <!-- HERO SLIDER -->
+  <section class="home-sec" style="max-width:1280px;margin:0 auto;padding:20px 30px 0">
+    <div style="position:relative;background:var(--p-blush);overflow:hidden;border-radius:var(--r)">
+      <div class="home-hero-wrap" style="position:relative;min-height:440px">
+        <div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center;opacity:{{ op0 }};transform:{{ tf0 }};transition:opacity 1s ease, transform 1.1s ease;pointer-events:{{ pe0 }}">
+          <div class="home-hero-img" style="position:relative;height:100%;min-height:340px;background:var(--p-blush);overflow:hidden">
+            <img src="assets/libos-hero.jpg" alt="Liboslar kolleksiyasi" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:kenburns 20s ease-in-out infinite alternate">
+          </div>
+          <div class="home-hero-text" style="padding:clamp(28px,4.5%,60px);display:flex;flex-direction:column;gap:22px">
+            <span class="kicker">{{ s0kicker }}</span>
+            <h1 style="font-family:var(--serif);font-weight:500;font-size:clamp(42px,6vw,68px);line-height:1.02">{{ s0h1a }}<br>{{ s0h1b }}</h1>
+            <a href="Catalog.dc.html?cat=liboslar" class="ulink" style="align-self:flex-start;margin-top:4px">{{ s0shop }}</a>
+          </div>
+        </div>
+        <div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center;opacity:{{ op1 }};transform:{{ tf1 }};transition:opacity 1s ease, transform 1.1s ease;pointer-events:{{ pe1 }}">
+          <div class="home-hero-img" style="position:relative;height:100%;min-height:340px;background:#000;overflow:hidden">
+            <img src="assets/atir-symphony.jpg" alt="Atir kolleksiyasi" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:kenburns 20s ease-in-out infinite alternate">
+
+          </div>
+          <div class="home-hero-text" style="padding:clamp(28px,4.5%,60px);display:flex;flex-direction:column;gap:22px">
+            <span class="kicker">{{ s1kicker }}</span>
+            <h1 style="font-family:var(--serif);font-weight:500;font-size:clamp(42px,6vw,68px);line-height:1.02">{{ s1h1a }}<br>{{ s1h1b }}</h1>
+            <a href="Catalog.dc.html?cat=atirlar" class="ulink" style="align-self:flex-start;margin-top:4px">{{ s1shop }}</a>
+          </div>
+        </div>
+        <div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center;opacity:{{ op2 }};transform:{{ tf2 }};transition:opacity 1s ease, transform 1.1s ease;pointer-events:{{ pe2 }}">
+          <div class="home-hero-img" style="position:relative;height:100%;min-height:340px;background:var(--p-cream);overflow:hidden">
+            <img src="assets/poyabzal.jpg" alt="Poyabzal kolleksiyasi" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:kenburns 20s ease-in-out infinite alternate">
+
+          </div>
+          <div class="home-hero-text" style="padding:clamp(28px,4.5%,60px);display:flex;flex-direction:column;gap:22px">
+            <span class="kicker">{{ s2kicker }}</span>
+            <h1 style="font-family:var(--serif);font-weight:500;font-size:clamp(42px,6vw,68px);line-height:1.02">{{ s2h1a }}<br>{{ s2h1b }}</h1>
+            <a href="Catalog.dc.html?cat=poyabzal" class="ulink" style="align-self:flex-start;margin-top:4px">{{ s2shop }}</a>
+          </div>
+        </div>
+      </div>
+      <button onClick="{{ prev }}" class="btn-icon home-hero-arrow" aria-label="Oldingi" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;background:rgba(255,255,255,.7)"><svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round"><polyline points="160 208 80 128 160 48"/></svg></button>
+      <button onClick="{{ next }}" class="btn-icon home-hero-arrow" aria-label="Keyingi" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;background:rgba(255,255,255,.7)"><svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round"><polyline points="96 48 176 128 96 208"/></svg></button>
+      <div style="position:absolute;left:clamp(20px,4%,44px);bottom:26px;font-size:14px;color:var(--ink-2);pointer-events:none"><span style="font-size:22px;font-family:var(--serif);color:var(--ink)">{{ curNo }}</span> /03</div>
+      <div style="position:absolute;right:26px;bottom:28px;display:flex;gap:8px">
+        <span onClick="{{ goto0 }}" style="width:9px;height:9px;border-radius:50%;cursor:pointer;background:{{ dot0 }}"></span>
+        <span onClick="{{ goto1 }}" style="width:9px;height:9px;border-radius:50%;cursor:pointer;background:{{ dot1 }}"></span>
+        <span onClick="{{ goto2 }}" style="width:9px;height:9px;border-radius:50%;cursor:pointer;background:{{ dot2 }}"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TWO PROMO TILES -->
+  <section class="home-sec" style="max-width:1280px;margin:0 auto;padding:18px 30px 0">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px">
+      <a href="Product.dc.html?id=lv-imagination" style="position:relative;background:var(--p-blue);border-radius:var(--r);overflow:hidden;display:flex;align-items:center;min-height:200px">
+        <div class="promo-txt" style="padding:30px;z-index:2">
+          <h3 style="font-size:26px;line-height:1.12;margin-bottom:10px">{{ t.promo1a }}<br>{{ t.promo1b }}</h3>
+          <span class="ulink">{{ t.shop }}</span>
+        </div>
+        <div class="promo-img" style="position:absolute;right:0;top:0;bottom:0;width:52%"><image-slot id="promo-lv" shape="rect" fit="cover" placeholder="Louis Vuitton Imagination"></image-slot></div>
+      </a>
+      <a href="Catalog.dc.html?cat=ichki" style="position:relative;background:var(--p-grey);border-radius:var(--r);overflow:hidden;display:flex;align-items:center;min-height:200px">
+        <div class="promo-txt" style="padding:30px;z-index:2">
+          <h3 style="font-size:26px;line-height:1.12;margin-bottom:10px">{{ t.promo2a }}<br>{{ t.promo2b }}</h3>
+          <span class="ulink">{{ t.shop }}</span>
+        </div>
+        <div class="promo-img" style="position:absolute;right:0;top:0;bottom:0;width:52%"><img src="assets/victoria.jpg" alt="Victoria's Secret" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- THREE TILE ROW -->
+  <section class="home-sec" style="max-width:1280px;margin:0 auto;padding:18px 30px 0">
+    <div class="home-3tile" style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:18px">
+      <a href="Catalog.dc.html?cat=liboslar" style="position:relative;background:var(--p-sage);border-radius:var(--r);overflow:hidden;min-height:220px;display:block">
+        <img src="assets/libos3.jpg" alt="Libos" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <span class="pbadge" style="position:absolute;left:20px;top:20px">500k</span>
+      </a>
+      <a href="Catalog.dc.html?cat=liboslar" style="position:relative;background:var(--p-cream);border-radius:var(--r);overflow:hidden;display:flex;align-items:center;min-height:220px">
+        <div class="promo-txt" style="padding:30px;z-index:2;max-width:46%">
+          <h3 style="font-size:27px;line-height:1.12;margin-bottom:10px">{{ t.tileBig }}</h3>
+          <span class="ulink">{{ t.shop }}</span>
+        </div>
+        <div class="promo-img" style="position:absolute;right:0;top:0;bottom:0;width:56%"><img src="assets/daffic.jpg" alt="Daffic" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+      </a>
+      <a href="Catalog.dc.html?cat=poyabzal" style="position:relative;background:var(--p-blush);border-radius:var(--r);overflow:hidden;min-height:220px;display:block">
+        <img src="assets/layki.jpg" alt="Poyabzal" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <span class="pbadge" style="position:absolute;left:20px;top:20px">393k</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FEATURE STRIP -->
+  <section class="home-sec" style="max-width:1280px;margin:0 auto;padding:64px 30px 0">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:34px 0">
+      <div style="display:flex;gap:14px;align-items:center;justify-content:center;text-align:left">
+        <svg width="30" height="30" viewBox="0 0 256 256" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"><path d="M16 176V64a8 8 0 0 1 8-8h120v120M144 96h40l32 40v40M64 200a24 24 0 1 0 48 0 24 24 0 0 0-48 0ZM160 200a24 24 0 1 0 48 0 24 24 0 0 0-48 0Z"/></svg>
+        <div><div style="font-weight:500;font-size:14px">{{ f0t }}</div><div class="muted" style="font-size:12.5px">{{ f0s }}</div></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;justify-content:center;text-align:left">
+        <svg width="30" height="30" viewBox="0 0 256 256" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round"><polyline points="80 100 40 100 40 60"/><path d="M40 100a96 96 0 1 1 20 84"/></svg>
+        <div><div style="font-weight:500;font-size:14px">{{ f1t }}</div><div class="muted" style="font-size:12.5px">{{ f1s }}</div></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;justify-content:center;text-align:left">
+        <svg width="30" height="30" viewBox="0 0 256 256" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linejoin="round"><path d="M40 60l88-28 88 28v72c0 64-88 92-88 92s-88-28-88-92Z"/><polyline points="100 128 120 148 160 104"/></svg>
+        <div><div style="font-weight:500;font-size:14px">{{ f2t }}</div><div class="muted" style="font-size:12.5px">{{ f2s }}</div></div>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="StoreFooter" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { slide: 0 };
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  componentDidMount() {
+    this._lh = () => this.forceUpdate();
+    window.addEventListener("suf-lang", this._lh);
+    this._timer = setInterval(() => this.setState((s) => ({ slide: (s.slide + 1) % 3 })), 10000);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("suf-lang", this._lh);
+    clearInterval(this._timer);
+  }
+  renderVals() {
+    const R = this.lang() === "ru";
+    const slide = this.state.slide;
+    const slides = R
+      ? [
+          { kicker: "Платья", h1a: "Турецкие", h1b: "платья", heroP: "", shop: "Купить", bg: "var(--p-blush)", perfume: false },
+          { kicker: "Парфюмерия", h1a: "Турецкая", h1b: "парфюмерия", heroP: "", shop: "Купить", bg: "#000", perfume: true },
+          { kicker: "Обувь", h1a: "Турецкая", h1b: "обувь", heroP: "", shop: "Купить", bg: "var(--p-cream)", perfume: false },
+        ]
+      : [
+          { kicker: "Liboslar", h1a: "Turkiya", h1b: "liboslari", heroP: "", shop: "Xarid qilish", bg: "var(--p-blush)", perfume: false },
+          { kicker: "Atirlar", h1a: "Turkiya", h1b: "atirlari", heroP: "", shop: "Xarid qilish", bg: "#000", perfume: true },
+          { kicker: "Poyabzallar", h1a: "Turkiya", h1b: "poyabzallari", heroP: "", shop: "Xarid qilish", bg: "var(--p-cream)", perfume: false },
+        ];
+    const cur = slides[slide];
+    const BLK = "#1C1C1C", BLU = "#5B7C99", GRY = "#B7A99E", MUS = "#C99A3C", RED = "#C0392B", PNK = "#E79E96", GRN = "#7A8B5A", OLV = "#9B8654", CRM = "#E9E0D2";
+    const t = R
+      ? { kicker: "Парфюмерия", h1a: "Изысканные", h1b: "ароматы", heroP: "Оригинальная парфюмерия мировых брендов — для женщин и мужчин. Стойкий аромат и фирменная упаковка.", shop: "Купить", promo1a: "Louis Vuitton", promo1b: "Imagination", promo2a: "Victoria's Secret", promo2b: "новая коллекция", tileBig: "Осенняя коллекция Daffic" }
+      : { kicker: "Atirlar", h1a: "Nafis", h1b: "atir hidlari", heroP: "Dunyo brendlaridan original parfyumeriya — ayollar va erkaklar uchun. Uzoq turuvchi hid va original qadoq.", shop: "Xarid qilish", promo1a: "Louis Vuitton", promo1b: "Imagination", promo2a: "Victoria's Secret", promo2b: "yangi kolleksiya", tileBig: "Kuzgi kolleksiya Daffic" };
+    const feat = R
+      ? [["Быстрая доставка", "По всему Узбекистану"], ["Возврат 14 дней", "Бесплатный обмен"], ["Безопасная оплата", "Payme · Click · наличные"], ["Поддержка 24/7", "Через Telegram"]]
+      : [["Tez yetkazib berish", "Butun O'zbekiston bo'ylab"], ["14 kun qaytarish", "Bepul almashtirish"], ["Xavfsiz to'lov", "Payme · Click · naqd"], ["24/7 qo'llab-quvvatlash", "Telegram orqali"]];
+    const tabLabels = R
+      ? ["Избранное", "Новинки", "Хиты продаж", "Со скидкой"]
+      : ["Tanlangan", "Yangi kelganlar", "Ko'p sotilgan", "Chegirmada"];
+    const P = (uz, ru) => (R ? ru : uz);
+    return {
+      t,
+      s0kicker: slides[0].kicker, s0h1a: slides[0].h1a, s0h1b: slides[0].h1b, s0shop: slides[0].shop,
+      s1kicker: slides[1].kicker, s1h1a: slides[1].h1a, s1h1b: slides[1].h1b, s1shop: slides[1].shop,
+      s2kicker: slides[2].kicker, s2h1a: slides[2].h1a, s2h1b: slides[2].h1b, s2shop: slides[2].shop,
+      op0: slide === 0 ? 1 : 0, op1: slide === 1 ? 1 : 0, op2: slide === 2 ? 1 : 0,
+      tf0: slide === 0 ? "scale(1)" : "scale(1.05)", tf1: slide === 1 ? "scale(1)" : "scale(1.05)", tf2: slide === 2 ? "scale(1)" : "scale(1.05)",
+      pe0: slide === 0 ? "auto" : "none", pe1: slide === 1 ? "auto" : "none", pe2: slide === 2 ? "auto" : "none",
+      curNo: ["01", "02", "03"][slide],
+      dot0: slide === 0 ? "var(--accent)" : "var(--line-2)",
+      dot1: slide === 1 ? "var(--accent)" : "var(--line-2)",
+      dot2: slide === 2 ? "var(--accent)" : "var(--line-2)",
+      prev: () => this.setState((s) => ({ slide: (s.slide + 2) % 3 })),
+      next: () => this.setState((s) => ({ slide: (s.slide + 1) % 3 })),
+      goto0: () => this.setState({ slide: 0 }),
+      goto1: () => this.setState({ slide: 1 }),
+      goto2: () => this.setState({ slide: 2 }),
+      f0t: feat[0][0], f0s: feat[0][1], f1t: feat[1][0], f1s: feat[1][1], f2t: feat[2][0], f2s: feat[2][1], f3t: feat[3][0], f3s: feat[3][1],
+      tabs: tabLabels.map((label, i) => ({ label, color: i === 0 ? "var(--ink)" : "var(--ink-soft)", uw: i === 0 ? "100%" : "0" })),
+      products: [
+        { id: "h1", title: P("Beysbolka", "Бейсболка"), price: "129 000", rating: 5, tags: [{ label: "New", type: "new" }], colors: [BLK, BLU, GRY] },
+        { id: "h2", title: P("Katakli ustki ko'ylak", "Рубашка в клетку"), price: "199 000", oldPrice: "390 000", rating: 4, tags: [{ label: "Sale", type: "sale" }], colors: [MUS, GRN, RED] },
+        { id: "h3", title: P("Klassik ko'ylak", "Классическая рубашка"), price: "349 000", rating: 4, tags: [{ label: "Hot", type: "hot" }], colors: [MUS, BLU, GRY] },
+        { id: "h4", title: P("Yirtiq jinsi shim", "Рваные джинсы"), price: "290 000", rating: 4, tags: [{ label: R ? "Нет в наличии" : "Out of Stock", type: "oos" }], colors: [BLU, BLK, GRY] },
+        { id: "h5", title: P("Charm sumka", "Кожаная сумка"), price: "690 000", rating: 4, tags: [], colors: [PNK, BLK, OLV] },
+        { id: "h6", title: P("Ipak bluzka", "Шёлковая блузка"), price: "259 000", rating: 5, tags: [], colors: [PNK, CRM, BLK] },
+        { id: "h7", title: P("Yozgi ko'ylak", "Летнее платье"), price: "319 000", rating: 4, tags: [], colors: [MUS, RED, CRM] },
+        { id: "h8", title: P("Qora klassik shim", "Чёрные классические брюки"), price: "279 000", rating: 4, tags: [], colors: [BLK, GRY, BLU] },
+        { id: "h9", title: P("Quyoshdan ko'zoynak", "Солнцезащитные очки"), price: "159 000", rating: 5, tags: [{ label: "New", type: "new" }], colors: [RED, BLK, MUS] },
+        { id: "h10", title: P("Gulli midi libos", "Платье миди в цветочек"), price: "459 000", rating: 4, tags: [], colors: [BLU, PNK, GRN] },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

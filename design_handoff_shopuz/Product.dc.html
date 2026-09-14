@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+<script src="./image-slot.js"></script>
+<style>
+@media (max-width:760px){
+  .pd-body{ padding:18px 16px !important; }
+  .pd-grid{ gap:24px !important; }
+}
+</style>
+</helmet>
+<div style="background:var(--bg);min-width:0">
+  <dc-import name="StoreNav" active="Do'kon" cart-count="2" hint-size="100%,84px"></dc-import>
+
+  <div class="pd-body" style="max-width:1280px;margin:0 auto;padding:30px">
+    <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);margin-bottom:28px;flex-wrap:wrap">
+      <a href="Home.dc.html" style="color:inherit">{{ crumbHome }}</a><span>—</span>
+      <a href="{{ catHref }}" style="color:inherit">{{ catName }}</a><span>—</span>
+      <span style="color:var(--ink)">{{ title }}</span>
+    </div>
+
+    <div class="pd-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:48px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <div style="position:relative;aspect-ratio:4/5;background:var(--tile);overflow:hidden">
+          <image-slot id="{{ mainSlot }}" shape="rect" fit="cover" placeholder="{{ title }}"></image-slot>
+          <sc-if value="{{ badge }}" hint-placeholder-val="{{ false }}"><span class="tag tag-hot" style="position:absolute;top:16px;left:16px">{{ badge }}</span></sc-if>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <div>
+          <span class="kicker">{{ catName }}</span>
+          <h1 style="margin:12px 0 10px;font-size:clamp(30px,4vw,46px)">{{ title }}</h1>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span></span>
+            <span class="muted" style="font-size:12.5px">{{ reviews }}</span>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+          <span style="font-family:var(--serif);font-weight:500;font-size:34px;color:{{ priceColor }}">{{ priceStr }}</span>
+          <sc-if value="{{ oldStr }}" hint-placeholder-val="{{ false }}"><span class="muted" style="text-decoration:line-through;font-size:17px">{{ oldStr }}</span></sc-if>
+        </div>
+
+        <p style="font-size:14px;color:var(--ink-2);line-height:1.8;max-width:52ch">{{ desc }}</p>
+
+        <div style="height:1px;background:var(--line)"></div>
+
+        <sc-if value="{{ isPerfume }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="font-size:13px;color:var(--ink-2);margin-bottom:12px">{{ volLabel }}</div>
+            <div style="display:flex;gap:9px;flex-wrap:wrap">
+              <sc-for list="{{ volumes }}" as="v" hint-placeholder-count="2">
+                <div style="border:1px solid {{ v.border }};background:{{ v.bg }};color:{{ v.color }};padding:12px 18px;cursor:pointer;text-align:center">
+                  <div style="font-size:14px;font-weight:500">{{ v.label }}</div>
+                  <div style="font-size:12px;opacity:.8;margin-top:2px">{{ v.price }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isApparel }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="font-size:13px;color:var(--ink-2);margin-bottom:12px">{{ colorLabel }}</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <sc-for list="{{ colors }}" as="c" hint-placeholder-count="4">
+                <span title="{{ c.name }}" style="width:32px;height:32px;border-radius:50%;background:{{ c.hex }};cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14){{ c.ring }}"></span>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+              <span style="font-size:13px;color:var(--ink-2)">{{ sizeLabelTxt }}</span>
+              <a href="Olcham.dc.html" class="ulink" style="font-size:11px;border-bottom-width:1px;padding-bottom:2px">{{ sizeChart }}</a>
+            </div>
+            <div style="display:flex;gap:9px;flex-wrap:wrap">
+              <sc-for list="{{ psizes }}" as="s" hint-placeholder-count="6">
+                <span style="min-width:46px;text-align:center;padding:11px 12px;font-size:14px;cursor:{{ s.cursor }};border:1px solid {{ s.border }};color:{{ s.color }};background:{{ s.bg }};{{ s.extra }}">{{ s.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;margin-top:4px">
+          <div style="display:flex;align-items:center;border:1px solid var(--line-2)">
+            <button class="btn-ghost" style="padding:0 16px;height:100%;color:var(--ink-2)">−</button>
+            <span style="min-width:34px;text-align:center;font-weight:500">1</span>
+            <button class="btn-ghost" style="padding:0 16px;height:100%;color:var(--ink-2)">+</button>
+          </div>
+          <a href="Cart.dc.html" class="btn btn-primary" style="flex:1;min-width:200px;gap:9px">
+            <svg width="17" height="17" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linejoin="round"><path d="M56 72h144l-11 128a16 16 0 0 1-16 15H83a16 16 0 0 1-16-15Z"/><path d="M88 96V72a40 40 0 0 1 80 0v24"/></svg>
+            {{ addLabel }}
+          </a>
+          <button class="btn-icon" aria-label="Sevimliga" style="width:52px;height:52px;border:1px solid var(--line-2);border-radius:0">
+            <svg width="19" height="19" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16"><path d="M128 216S28 160 28 92a52 52 0 0 1 100-20 52 52 0 0 1 100 20c0 68-100 124-100 124Z"/></svg>
+          </button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px;padding-top:20px;border-top:1px solid var(--line)">
+          <div style="display:flex;gap:12px;align-items:center;font-size:13px;color:var(--ink-2)"><svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="var(--accent)" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"><path d="M16 176V64a8 8 0 0 1 8-8h120v120M144 96h40l32 40v40M64 200a24 24 0 1 0 48 0 24 24 0 0 0-48 0ZM160 200a24 24 0 1 0 48 0 24 24 0 0 0-48 0Z"/></svg>{{ perk1 }}</div>
+          <div style="display:flex;gap:12px;align-items:center;font-size:13px;color:var(--ink-2)"><svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="var(--accent)" stroke-width="14" stroke-linecap="round"><polyline points="80 100 40 100 40 60"/><path d="M40 100a96 96 0 1 1 20 84"/></svg>{{ perk2 }}</div>
+          <div style="display:flex;gap:12px;align-items:center;font-size:13px;color:var(--ink-2)"><svg width="18" height="18" viewBox="0 0 256 256" fill="none" stroke="var(--accent)" stroke-width="14" stroke-linejoin="round"><path d="M40 60l88-28 88 28v72c0 64-88 92-88 92s-88-28-88-92Z"/></svg>{{ perk3 }}</div>
+        </div>
+      </div>
+    </div>
+
+    <section style="margin-top:80px">
+      <h2 style="font-size:clamp(26px,3.4vw,38px);text-align:center;margin-bottom:40px">{{ relatedTitle }}</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:26px 22px">
+        <sc-for list="{{ related }}" as="p" hint-placeholder-count="4">
+          <dc-import name="ProductCard" slot-id="{{ p.id }}" title="{{ p.title }}" price="{{ p.price }}" old-price="{{ p.oldPrice }}" rating="{{ p.rating }}" tags="{{ p.tags }}" color-dots="{{ p.colors }}" size-label="{{ p.sizeLabel }}" decant="{{ p.decant }}" hint-size="100%,380px"></dc-import>
+        </sc-for>
+      </div>
+    </section>
+  </div>
+
+  <dc-import name="StoreFooter" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  pid() { try { return new URLSearchParams(location.search).get("id"); } catch (e) { return null; } }
+  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  renderVals() {
+    const R = this.lang() === "ru";
+    const P = (uz, ru) => (R ? ru : uz);
+    const cur = R ? " сум" : " so'm";
+    const BLK = "#1C1C1C", BLU = "#5B7C99", GRY = "#B7A99E", RED = "#C0392B", PNK = "#E79E96", CRM = "#E9E0D2", LIL = "#B49AC0";
+
+    const DB = {
+      "lv-imagination": {
+        perfume: true, slot: "pd-lv", badge: P("Bestseller", "Хит продаж"),
+        cat: P("Atirlar", "Парфюмерия"), catHref: "Catalog.dc.html?cat=atirlar",
+        title: "Louis Vuitton Imagination", price: "460 000",
+        desc: P("Turkiyadan kelgan Lux kopiya atir. Uzoq turuvchi, nafis hid — kundalik va maxsus onlar uchun. Original qadoq.", "Люкс-копия аромата из Турции. Стойкий, изысканный запах — на каждый день и для особых случаев. Оригинальная упаковка."),
+        volumes: [
+          { label: "100 ml", price: "460 000" + cur, on: true },
+          { label: P("10 ml (quyib berish)", "10 мл (на разлив)"), price: "75 000" + cur, on: false },
+        ],
+      },
+      default: {
+        perfume: false, slot: "pd-main", badge: P("Hot", "Хит"),
+        cat: P("Ayollar · Libos", "Женщины · Платье"), catHref: "Catalog.dc.html?cat=liboslar",
+        title: P("Payetkali kechki libos", "Вечернее платье с пайетками"), price: "579 000", oldPrice: "740 000",
+        desc: P("Payetka bilan bezatilgan kechki libos — bayram va maxsus tadbirlar uchun. Yumshoq astar, qulay kesim.", "Вечернее платье с пайетками — для праздников и особых случаев. Мягкая подкладка, удобный крой."),
+      },
+    };
+    const prod = DB[this.pid()] || DB.default;
+
+    const mkSize = (label, state) => {
+      if (state === "off") return { label, cursor: "not-allowed", border: "var(--line)", color: "var(--ink-soft)", bg: "var(--surface)", extra: "text-decoration:line-through;opacity:.55" };
+      if (state === "on") return { label, cursor: "pointer", border: "var(--ink)", color: "#fff", bg: "var(--ink)", extra: "" };
+      return { label, cursor: "pointer", border: "var(--line-2)", color: "var(--ink-2)", bg: "var(--surface)", extra: "" };
+    };
+    const vol = (prod.volumes || []).map((v) => ({ label: v.label, price: v.price, border: v.on ? "var(--ink)" : "var(--line-2)", bg: v.on ? "var(--ink)" : "var(--surface)", color: v.on ? "#fff" : "var(--ink-2)" }));
+
+    const perfRelated = [
+      { id: "r-a1", title: "Miss Dior Blooming Bouquet", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "r-a2", title: "Coco Mademoiselle Chanel", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "r-a3", title: "My Way Nectar", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "r-a4", title: "Hormone Gaba", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+    ];
+    const dressRelated = [
+      { id: "r-l1", title: P("Yozgi sarafan", "Летний сарафан"), price: "419 000", rating: 5, tags: [{ label: "Hot", type: "hot" }], colors: [RED, PNK, CRM] },
+      { id: "r-l2", title: P("Ipak bluzka", "Шёлковая блузка"), price: "299 000", rating: 4, tags: [], colors: [CRM, PNK, BLK] },
+      { id: "r-l3", title: P("Gulli midi libos", "Платье миди в цветочек"), price: "459 000", rating: 4, tags: [], colors: [BLU, PNK, BLK] },
+      { id: "r-l4", title: P("Ipak koktebl libos", "Шёлковое коктейльное платье"), price: "529 000", rating: 4, tags: [], colors: [BLK, LIL, CRM] },
+    ];
+
+    return {
+      crumbHome: R ? "Главная" : "Bosh sahifa",
+      catName: prod.cat, catHref: prod.catHref,
+      title: prod.title,
+      mainSlot: prod.slot,
+      badge: prod.badge,
+      reviews: R ? "126 отзывов" : "126 sharh",
+      priceStr: prod.price + cur,
+      priceColor: prod.oldPrice ? "var(--sale)" : "var(--ink)",
+      oldStr: prod.oldPrice ? prod.oldPrice + cur : null,
+      desc: prod.desc,
+      isPerfume: !!prod.perfume,
+      isApparel: !prod.perfume,
+      volLabel: R ? "Объём:" : "Hajm:",
+      volumes: vol,
+      colorLabel: R ? "Цвет: Красный" : "Rang: Qizil",
+      colors: [
+        { name: R ? "Красный" : "Qizil", hex: "#C0392B", ring: ", 0 0 0 2px var(--accent)" },
+        { name: R ? "Чёрный" : "Qora", hex: "#1C1C1C", ring: "" },
+        { name: R ? "Розовый" : "Pushti", hex: "#E79E96", ring: "" },
+        { name: R ? "Кремовый" : "Krem", hex: "#E9E0D2", ring: "" },
+      ],
+      sizeLabelTxt: R ? "Размер (Турция): 40" : "O'lcham (Turk): 40",
+      sizeChart: R ? "Таблица размеров" : "O'lcham jadvali",
+      psizes: Array.from({ length: 11 }, (_, i) => { const v = 36 + i * 2; return mkSize(String(v), v === 40 ? "on" : (v === 56 ? "off" : undefined)); }),
+      thumbs: [{ id: "pt1", ring: "var(--ink)" }, { id: "pt2", ring: "transparent" }, { id: "pt3", ring: "transparent" }, { id: "pt4", ring: "transparent" }],
+      addLabel: R ? "В корзину" : "Savatga qo'shish",
+      perk1: R ? "Курьер по Ташкенту — 30 000 сум · 1–2 дня" : "Toshkent bo'ylab kuryer — 30 000 so'm · 1–2 kun",
+      perk2: R ? "Бесплатный возврат и обмен в течение 14 дней" : "14 kun ichida bepul qaytarish va almashtirish",
+      perk3: R ? "Наличные или онлайн: Payme · Click · Uzcard" : "Naqd yoki onlayn: Payme · Click · Uzcard",
+      relatedTitle: R ? "Похожие товары" : "O'xshash mahsulotlar",
+      related: prod.perfume ? perfRelated : dressRelated,
+    };
+  }
+}
+</script>
+</body>
+</html>

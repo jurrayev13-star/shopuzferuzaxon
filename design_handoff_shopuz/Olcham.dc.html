@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+</helmet>
+<div style="background:var(--bg);min-width:0;min-height:100%">
+  <dc-import name="StoreNav" active="" cart-count="2" hint-size="100%,84px"></dc-import>
+
+  <div style="max-width:720px;margin:0 auto;padding:48px 30px 20px;text-align:center">
+    <span class="kicker">{{ kicker }}</span>
+    <h1 style="font-size:clamp(30px,4.4vw,46px);margin-top:12px">{{ title }}</h1>
+    <p class="muted" style="font-size:14px;margin-top:10px;line-height:1.7">{{ subtitle }}</p>
+  </div>
+
+  <div style="max-width:640px;margin:0 auto;padding:10px 30px 20px">
+    <div style="border:1px solid var(--line);border-radius:var(--r);overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 1.4fr 1fr;background:var(--ink);color:#fff">
+        <div style="padding:16px 12px;text-align:center;font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.12em;text-transform:uppercase">{{ colCis }}</div>
+        <div style="padding:16px 12px;text-align:center;font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.12em;text-transform:uppercase;border-left:1px solid rgba(255,255,255,.15);border-right:1px solid rgba(255,255,255,.15)">{{ colTr }}</div>
+        <div style="padding:16px 12px;text-align:center;font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.12em;text-transform:uppercase">{{ colSize }}</div>
+      </div>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:1fr 1.4fr 1fr;background:{{ r.bg }};border-top:1px solid var(--line)">
+          <div style="padding:15px 12px;text-align:center;font-size:16px;color:var(--ink-2)">{{ r.cis }}</div>
+          <div style="padding:15px 12px;text-align:center;font-size:16px;font-family:var(--serif);font-weight:600;color:var(--ink);border-left:1px solid var(--line);border-right:1px solid var(--line)">{{ r.tr }}</div>
+          <div style="padding:15px 12px;text-align:center;font-size:15px;font-weight:500;color:var(--accent-deep)">{{ r.size }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:16px 18px;background:var(--accent-100);border-radius:var(--r-sm)">
+      <svg width="20" height="20" viewBox="0 0 256 256" fill="none" stroke="var(--accent)" stroke-width="16" style="flex:none;margin-top:1px"><circle cx="128" cy="128" r="96"/><line x1="128" y1="120" x2="128" y2="176"/><circle cx="128" cy="84" r="6" fill="var(--accent)" stroke="none"/></svg>
+      <p style="font-size:13px;color:var(--ink-2);line-height:1.65">{{ note }}</p>
+    </div>
+
+    <div style="text-align:center;margin-top:26px">
+      <a href="Catalog.dc.html" class="btn btn-primary">{{ backBtn }}</a>
+    </div>
+  </div>
+
+  <dc-import name="StoreFooter" hint-size="100%,260px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  renderVals() {
+    const R = this.lang() === "ru";
+    const data = [
+      ["40", "32", "XS"], ["42", "34", "S"], ["44", "34-36", "S-M"], ["46", "38-40", "M"],
+      ["48", "40", "L"], ["50", "42", "L"], ["52", "44", "XL"], ["54", "46", "XXL"],
+    ];
+    return {
+      kicker: R ? "Гид по размерам" : "O'lcham qo'llanmasi",
+      title: R ? "Таблица размеров" : "O'lchamlar jadvali",
+      subtitle: R ? "Наши размеры указаны по турецкой системе. Найдите свой размер СНГ и подберите турецкий." : "Bizdagi o'lchamlar Turkiya tizimida. O'zingizning MDH o'lchamingizni toping va Turkiya o'lchamini tanlang.",
+      colCis: R ? "СНГ" : "MDH",
+      colTr: R ? "Турция" : "Turkiya",
+      colSize: R ? "Размер" : "O'lcham",
+      rows: data.map((d, i) => ({ cis: d[0], tr: d[1], size: d[2], bg: i % 2 ? "var(--bg-2)" : "var(--surface)" })),
+      note: R ? "При заказе выбирайте размер по столбцу «Турция». Если сомневаетесь — напишите админу, поможем подобрать." : "Buyurtma berishda «Turkiya» ustuni bo'yicha o'lcham tanlang. Shubhangiz bo'lsa — adminga yozing, tanlashda yordam beramiz.",
+      backBtn: R ? "Вернуться к покупкам" : "Xaridga qaytish",
+    };
+  }
+}
+</script>
+</body>
+</html>

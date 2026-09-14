@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+<script src="./image-slot.js"></script>
+</helmet>
+<div style="background:var(--bg);min-width:0;min-height:100%">
+  <dc-import name="StoreNav" active="" cart-count="2" hint-size="100%,84px"></dc-import>
+
+  <div style="max-width:1080px;margin:0 auto;padding:44px 30px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));border:1px solid var(--line);overflow:hidden">
+      <div style="position:relative;min-height:420px;background:var(--tile)">
+        <image-slot id="login-visual" shape="rect" fit="cover" placeholder="Brend / kolleksiya rasmi"></image-slot>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(28,28,28,.5));pointer-events:none"></div>
+        <div style="position:absolute;left:30px;bottom:28px;right:30px;pointer-events:none">
+          <div style="font-family:var(--serif);font-weight:600;font-size:24px;color:#fff;margin-bottom:8px">Shop Uz Feruzaxon</div>
+          <p style="margin:0;font-size:14px;color:rgba(255,255,255,.9);max-width:32ch;line-height:1.6">{{ heroText }}</p>
+        </div>
+      </div>
+
+      <div style="padding:clamp(28px,4%,48px);display:flex;flex-direction:column;gap:20px;justify-content:center">
+        <div style="display:flex;gap:28px;border-bottom:1px solid var(--line);align-self:stretch">
+          <span onClick="{{ setLogin }}" style="padding-bottom:12px;font-family:var(--serif);font-size:22px;cursor:pointer;color:{{ loginColor }};border-bottom:{{ loginBorder }};margin-bottom:-1px">{{ tabLogin }}</span>
+          <span onClick="{{ setRegister }}" style="padding-bottom:12px;font-family:var(--serif);font-size:22px;cursor:pointer;color:{{ regColor }};border-bottom:{{ regBorder }};margin-bottom:-1px">{{ tabRegister }}</span>
+        </div>
+
+        <p class="muted" style="font-size:13.5px;line-height:1.6">{{ intro }}</p>
+
+        <!-- STEP: phone -->
+        <sc-if value="{{ stepPhone }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ isRegister }}" hint-placeholder-val="{{ false }}">
+            <div class="field">
+              <label>{{ nameLabel }}</label>
+              <input class="input" value="{{ name }}" onInput="{{ onName }}" placeholder="{{ namePh }}" style="font-family:var(--sans);font-size:14px">
+            </div>
+          </sc-if>
+          <div class="field">
+            <label>{{ phoneLabel }}</label>
+            <div class="input" style="display:flex;align-items:center;gap:10px;padding:0 14px">
+              <span style="font-weight:500;color:var(--ink-2);border-right:1px solid var(--line-2);padding-right:10px">+998</span>
+              <input type="tel" value="{{ phone }}" onInput="{{ onPhone }}" placeholder="90 123 45 67" style="border:0;background:transparent;color:inherit;font:inherit;font-family:var(--sans);font-size:14px;width:100%;outline:none;padding:12px 0">
+            </div>
+            <sc-if value="{{ phoneError }}" hint-placeholder-val="{{ false }}"><p style="color:var(--accent);font-size:11.5px;margin-top:8px">{{ phoneError }}</p></sc-if>
+          </div>
+          <button onClick="{{ sendCode }}" class="btn btn-primary btn-block" style="padding:16px;border:none;cursor:pointer">{{ sendBtn }}</button>
+        </sc-if>
+
+        <!-- STEP: code -->
+        <sc-if value="{{ stepCode }}" hint-placeholder-val="{{ false }}">
+          <div class="field">
+            <label>{{ smsLabel }}</label>
+            <div style="display:flex;gap:9px">
+              <sc-for list="{{ codeBoxes }}" as="b" hint-placeholder-count="5">
+                <input class="input" inputmode="numeric" maxlength="1" value="{{ b.v }}" data-idx="{{ b.idx }}" onInput="{{ onCode }}" onKeyDown="{{ onCodeKey }}" ref="{{ b.ref }}" style="text-align:center;font-family:var(--serif);font-weight:600;font-size:20px;padding:0;height:52px;flex:1;min-width:0"></input>
+              </sc-for>
+            </div>
+            <p class="muted" style="font-size:11.5px;margin-top:10px">{{ sentTo }} · <a href="#" onClick="{{ resend }}">{{ resendLabel }}</a></p>
+            <div style="margin-top:10px;padding:10px 12px;background:var(--bg-2);font-size:11.5px;color:var(--ink-2)">{{ demoHint }} <b style="letter-spacing:3px;font-family:var(--serif)">{{ demoCode }}</b></div>
+            <sc-if value="{{ codeError }}" hint-placeholder-val="{{ false }}"><p style="color:var(--accent);font-size:11.5px;margin-top:8px">{{ codeError }}</p></sc-if>
+          </div>
+          <button onClick="{{ verify }}" class="btn btn-primary btn-block" style="padding:16px;border:none;cursor:pointer">{{ verifyBtn }}</button>
+          <button onClick="{{ backToPhone }}" class="btn btn-ghost" style="align-self:center;border:none;background:none;cursor:pointer">← {{ changeNumber }}</button>
+        </sc-if>
+
+        <div style="display:flex;align-items:center;gap:14px;color:var(--ink-soft);font-size:11px;letter-spacing:.1em">
+          <span style="flex:1;height:1px;background:var(--line)"></span>{{ orLabel }}<span style="flex:1;height:1px;background:var(--line)"></span>
+        </div>
+
+        <a href="https://t.me/ShopuzFeruzaxon" target="_blank" rel="noopener" class="btn btn-secondary btn-block" style="padding:14px;gap:9px">
+          <svg width="18" height="18" viewBox="0 0 256 256" fill="var(--accent)"><path d="M228 44 26 122c-11 4-11 19 0 23l52 18 18 55c3 10 16 12 23 3l26-31 45 33c8 6 20 2 22-8l30-160c3-12-9-22-20-16Z"/></svg>
+          {{ tgBtn }}
+        </a>
+
+        <p class="muted" style="font-size:11.5px;text-align:center;line-height:1.6">{{ termsPre }} <a href="#">{{ termsA }}</a> {{ termsAnd }} <a href="#">{{ termsB }}</a>{{ termsPost }}</p>
+      </div>
+    </div>
+  </div>
+
+  <dc-import name="StoreFooter" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode: "login", step: "phone", name: "", phone: "", code: ["", "", "", "", ""], demo: "", phoneError: "", codeError: "" };
+  refs = [];
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+
+  digits(s) { return (s || "").replace(/[^0-9]/g, ""); }
+  fmtPhone(d) {
+    d = d.slice(0, 9);
+    let out = d.slice(0, 2);
+    if (d.length > 2) out += " " + d.slice(2, 5);
+    if (d.length > 5) out += " " + d.slice(5, 7);
+    if (d.length > 7) out += " " + d.slice(7, 9);
+    return out;
+  }
+  maskedPhone() {
+    const d = this.digits(this.state.phone);
+    return "+998 " + (d.slice(0, 2) || "90") + " *** " + (d.slice(7, 9) || "**");
+  }
+
+  sendCode() {
+    const R = this.lang() === "ru";
+    const d = this.digits(this.state.phone);
+    if (d.length < 9) { this.setState({ phoneError: R ? "Введите 9 цифр номера" : "Raqamning 9 ta raqamini kiriting" }); return; }
+    if (this.state.mode === "register" && !this.state.name.trim()) { this.setState({ phoneError: R ? "Введите имя" : "Ismingizni kiriting" }); return; }
+    const demo = String(Math.floor(10000 + Math.random() * 90000));
+    this.setState({ step: "code", demo, code: ["", "", "", "", ""], phoneError: "", codeError: "" });
+    setTimeout(() => { if (this.refs[0]) this.refs[0].focus(); }, 30);
+  }
+  onCode(e) {
+    const idx = parseInt(e.target.getAttribute("data-idx"), 10);
+    const v = this.digits(e.target.value).slice(-1);
+    const code = this.state.code.slice();
+    code[idx] = v;
+    this.setState({ code, codeError: "" });
+    if (v && idx < 4 && this.refs[idx + 1]) this.refs[idx + 1].focus();
+  }
+  onCodeKey(e) {
+    const idx = parseInt(e.target.getAttribute("data-idx"), 10);
+    if (e.key === "Backspace" && !this.state.code[idx] && idx > 0 && this.refs[idx - 1]) this.refs[idx - 1].focus();
+  }
+  verify() {
+    const R = this.lang() === "ru";
+    const entered = this.state.code.join("");
+    if (entered.length < 5) { this.setState({ codeError: R ? "Введите 5-значный код" : "5 xonali kodni kiriting" }); return; }
+    if (entered !== this.state.demo) { this.setState({ codeError: R ? "Неверный код, попробуйте снова" : "Kod noto'g'ri, qayta urinib ko'ring" }); return; }
+    const user = { name: this.state.name.trim() || (R ? "Mijoz" : "Mijoz"), phone: "+998" + this.digits(this.state.phone) };
+    try { localStorage.setItem("suf_user", JSON.stringify(user)); } catch (e) {}
+    window.dispatchEvent(new CustomEvent("suf-auth"));
+    window.location.href = "Home.dc.html";
+  }
+  backToPhone() { this.setState({ step: "phone", codeError: "" }); }
+  resend(e) { if (e && e.preventDefault) e.preventDefault(); this.sendCode(); }
+
+  renderVals() {
+    const R = this.lang() === "ru";
+    const isReg = this.state.mode === "register";
+    return {
+      heroText: R ? "Войдите — корзина, заказы и избранное в одном месте." : "Kiring — savatingiz, buyurtmalaringiz va sevimlilaringiz bir joyda.",
+      tabLogin: R ? "Вход" : "Kirish",
+      tabRegister: R ? "Регистрация" : "Ro'yxatdan o'tish",
+      loginColor: isReg ? "var(--ink-soft)" : "var(--ink)",
+      regColor: isReg ? "var(--ink)" : "var(--ink-soft)",
+      loginBorder: isReg ? "none" : "1.5px solid var(--accent)",
+      regBorder: isReg ? "1.5px solid var(--accent)" : "none",
+      setLogin: () => this.setState({ mode: "login", step: "phone", phoneError: "", codeError: "" }),
+      setRegister: () => this.setState({ mode: "register", step: "phone", phoneError: "", codeError: "" }),
+      isRegister: isReg,
+      intro: this.state.step === "code"
+        ? (R ? "Мы отправили код на ваш номер." : "Raqamingizga kod yubordik.")
+        : (isReg
+            ? (R ? "Создайте аккаунт — введите имя и номер телефона." : "Hisob yarating — ism va telefon raqamingizni kiriting.")
+            : (R ? "Введите номер телефона — подтвердим по SMS." : "Telefon raqamingizni kiriting — SMS orqali tasdiqlaymiz.")),
+      stepPhone: this.state.step === "phone",
+      stepCode: this.state.step === "code",
+      nameLabel: R ? "Имя" : "Ism",
+      namePh: R ? "Ваше имя" : "Ismingiz",
+      name: this.state.name,
+      onName: (e) => this.setState({ name: e.target.value }),
+      phoneLabel: R ? "Номер телефона" : "Telefon raqam",
+      phone: this.state.phone,
+      onPhone: (e) => this.setState({ phone: this.fmtPhone(this.digits(e.target.value)), phoneError: "" }),
+      phoneError: this.state.phoneError,
+      sendBtn: R ? "Получить код" : "Kodni yuborish",
+      smsLabel: R ? "SMS код" : "SMS kod",
+      codeBoxes: this.state.code.map((v, i) => ({ v, idx: i, ref: (el) => { this.refs[i] = el; } })),
+      onCode: (e) => this.onCode(e),
+      onCodeKey: (e) => this.onCodeKey(e),
+      sentTo: (R ? "Код отправлен на " : "Kod ") + this.maskedPhone() + (R ? "" : " raqamiga yuborildi"),
+      resendLabel: R ? "Отправить снова" : "Qayta yuborish",
+      resend: (e) => this.resend(e),
+      demoHint: R ? "Демо-код:" : "Demo kod:",
+      demoCode: this.state.demo,
+      codeError: this.state.codeError,
+      verifyBtn: R ? "Подтвердить и войти" : "Tasdiqlash va kirish",
+      verify: () => this.verify(),
+      backToPhone: () => this.backToPhone(),
+      changeNumber: R ? "Изменить номер" : "Raqamni o'zgartirish",
+      orLabel: R ? "ИЛИ" : "YOKI",
+      tgBtn: R ? "Продолжить через Telegram" : "Telegram orqali davom etish",
+      termsPre: R ? "Продолжая, вы соглашаетесь с" : "Davom etish orqali",
+      termsA: R ? "Условиями" : "Foydalanish shartlari",
+      termsAnd: R ? "и" : "va",
+      termsB: R ? "Политикой конфиденциальности" : "Maxfiylik siyosati",
+      termsPost: R ? "." : "ga rozilik bildirasiz.",
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+/* Shop Uz Feruzaxon — "Noda"-style light minimal design tokens + components */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600&display=swap');
+
+:root{
+  --bg:#FFFFFF;
+  --bg-2:#FAFAF8;         /* faint off-white band */
+  --tile:#F4F3F1;         /* product image ground */
+  --surface:#FFFFFF;
+
+  --ink:#1C1C1C;          /* near-black text */
+  --ink-2:#4A4A4A;
+  --ink-soft:#9A9A9A;     /* muted grey */
+  --line:#ECECEC;
+  --line-2:#E0E0E0;
+
+  --accent:#2E9E7B;       /* Noda green (price badge / active) */
+  --accent-deep:#238466;
+  --accent-100:#E4F2ED;
+
+  --sale:#E4572E;         /* sale price red */
+  --gold:#E9B44C;         /* star rating */
+
+  /* soft pastel promo grounds */
+  --p-blush:#F4E7E3;
+  --p-blue:#E3EDF0;
+  --p-grey:#ECECEA;
+  --p-sage:#E7EDE6;
+  --p-cream:#F3ECE2;
+  --p-rose:#F6E7E7;
+
+  --r-sm:6px;
+  --r:10px;
+  --r-lg:16px;
+
+  --sh-sm:0 2px 14px rgba(28,28,28,.05);
+  --sh:0 10px 34px rgba(28,28,28,.09);
+
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Jost",system-ui,-apple-system,sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:400;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,h5{font-family:var(--serif);font-weight:500;line-height:1.08;letter-spacing:0;margin:0}
+p{margin:0}
+img{display:block;max-width:100%}
+a{color:var(--ink);text-decoration:none}
+a:hover{color:var(--accent)}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:var(--accent-100)}
+.muted{color:var(--ink-soft)}
+.serif{font-family:var(--serif)}
+
+/* underline "Shop Now" style link */
+.ulink{display:inline-flex;align-items:center;gap:6px;font-family:var(--sans);font-weight:500;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);border-bottom:1.5px solid var(--ink);padding-bottom:3px;transition:.16s}
+.ulink:hover{color:var(--accent);border-color:var(--accent)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  font-family:var(--sans);font-weight:500;font-size:13px;letter-spacing:.03em;line-height:1;text-decoration:none;
+  padding:14px 26px;border-radius:0;border:1px solid transparent;transition:.16s ease;white-space:nowrap}
+.btn svg{display:block}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:var(--accent);color:#fff}
+.btn-secondary{background:transparent;color:var(--ink);border-color:var(--ink)}
+.btn-secondary:hover{background:var(--ink);color:#fff}
+.btn-ghost{background:transparent;color:var(--ink);padding:6px 8px}
+.btn-ghost:hover{color:var(--accent)}
+.btn-block{width:100%}
+.btn-icon{width:40px;height:40px;padding:0;border-radius:50%;background:transparent;color:var(--ink);border:none}
+.btn-icon:hover{color:var(--accent)}
+
+/* tags / badges */
+.tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-weight:500;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border-radius:3px;color:#fff}
+.tag-new{background:var(--accent)}
+.tag-sale{background:var(--gold);color:var(--ink)}
+.tag-hot{background:var(--sale)}
+.tag-oos{background:#8A8A8A}
+.tag-outline{background:transparent;border:1px solid var(--line-2);color:var(--ink-2);text-transform:none;letter-spacing:0}
+
+/* round price badge (e.g. $64) */
+.pbadge{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;font-family:var(--sans);font-weight:500;font-size:14px}
+
+/* star rating */
+.stars{font-size:13px;letter-spacing:2px;line-height:1}
+.stars .on{color:var(--gold)}
+.stars .off{color:var(--line-2)}
+
+/* inputs */
+.input{width:100%;min-height:46px;padding:12px 14px;font:inherit;font-family:var(--sans);font-size:14px;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line-2);border-radius:0}
+.input::placeholder{color:var(--ink-soft)}
+.input:focus-visible{border-color:var(--accent);outline:none}
+.field>label{display:block;font-size:12px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;margin-bottom:8px;color:var(--ink-2)}
+
+/* card */
+.card{background:var(--surface)}
+.section-title{font-family:var(--serif);font-size:clamp(28px,3.6vw,40px);font-weight:500}
+.kicker{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}

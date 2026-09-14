@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+<script src="./image-slot.js"></script>
+<style>
+@keyframes bnBgShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+@keyframes bnSweep { 0% { transform: translateX(-140%) skewX(-14deg); } 60% { transform: translateX(140%) skewX(-14deg); } 100% { transform: translateX(140%) skewX(-14deg); } }
+@keyframes bnGlow { 0%,100% { opacity: .35; transform: scale(1); } 50% { opacity: .6; transform: scale(1.15); } }
+@keyframes bnFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes atirFloat { 0%,100% { transform: scale(1.04) translateY(0); } 50% { transform: scale(1.04) translateY(-14px); } }
+@media (max-width:760px){
+  .cat-body{ padding:18px 16px !important; }
+  .cat-aside{ max-width:100% !important; min-width:0 !important; width:100% !important; position:static !important; flex-basis:100% !important; }
+}
+</style>
+</helmet>
+<div style="background:var(--bg);min-width:0">
+  <dc-import name="StoreNav" active="Do'kon" cart-count="2" hint-size="100%,84px"></dc-import>
+
+  <sc-if value="{{ showPromo }}" hint-placeholder-val="{{ true }}">
+  <section style="max-width:1280px;margin:0 auto;padding:24px 30px 0">
+    <div style="position:relative;overflow:hidden;border-radius:var(--r);background:linear-gradient(115deg,#1C1C1C 0%,#3A2E2A 35%,#5A3B36 55%,#2A211C 80%,#1C1C1C 100%);background-size:300% 300%;animation:bnBgShift 14s ease infinite;color:#fff;padding:clamp(24px,4%,42px);display:flex;flex-wrap:wrap;align-items:center;gap:26px;justify-content:space-between">
+      <div style="position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(233,180,76,.18);animation:bnGlow 6s ease-in-out infinite;pointer-events:none"></div>
+      <div style="position:absolute;left:-30px;bottom:-50px;width:170px;height:170px;border-radius:50%;background:rgba(184,63,47,.14);animation:bnGlow 8s ease-in-out infinite;pointer-events:none"></div>
+      <div style="position:absolute;inset:0;width:40%;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.14) 50%,transparent 65%);animation:bnSweep 6.5s ease-in-out infinite;pointer-events:none;mix-blend-mode:screen"></div>
+      <div style="position:relative;max-width:54ch;min-width:240px">
+        <span style="font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)">{{ promoKicker }}</span>
+        <h2 style="color:#fff;font-size:clamp(24px,3.4vw,38px);line-height:1.08;margin:12px 0 8px">{{ promoTitle }}</h2>
+        <p style="color:rgba(255,255,255,.82);font-size:14px;line-height:1.6">{{ promoSub }}</p>
+      </div>
+      <div style="position:relative;display:flex;gap:14px;flex-wrap:wrap">
+        <div style="text-align:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-sm);padding:16px 18px;min-width:92px"><div style="font-family:var(--serif);font-weight:600;font-size:34px;color:#fff;line-height:1">10%</div><div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-top:4px">{{ promoWord }}</div></div>
+        <div style="text-align:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-sm);padding:16px 18px;min-width:92px"><div style="font-family:var(--serif);font-weight:600;font-size:34px;color:#fff;line-height:1">30%</div><div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-top:4px">{{ promoWord }}</div></div>
+        <div style="text-align:center;background:var(--gold);border:1px solid var(--gold);border-radius:var(--r-sm);padding:16px 18px;min-width:92px;animation:bnFloat 4s ease-in-out infinite;box-shadow:0 10px 30px rgba(233,180,76,.35)"><div style="font-family:var(--serif);font-weight:700;font-size:34px;color:var(--ink);line-height:1">50%</div><div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);margin-top:4px">{{ promoWord }}</div></div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ showAtirHero }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:1280px;margin:0 auto;padding:24px 30px 0">
+    <div style="position:relative;overflow:hidden;border-radius:var(--r);background:linear-gradient(115deg,#EFE7DA 0%,#E4D5C4 55%,#D8C3AC 100%);display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center;min-height:340px">
+      <div style="padding:clamp(26px,4%,48px);display:flex;flex-direction:column;gap:18px;z-index:2">
+        <span style="font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-deep)">{{ atirKicker }}</span>
+        <h2 style="font-size:clamp(26px,3.6vw,42px);line-height:1.1;color:var(--ink)">{{ atirTitle }}</h2>
+        <p style="font-size:15px;color:var(--ink-2);line-height:1.7;max-width:42ch">{{ atirSub }}</p>
+      </div>
+      <div style="position:relative;align-self:stretch;min-height:280px;overflow:hidden">
+        <img src="assets/atir-hero.jpg" alt="Atir" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:atirFloat 6s ease-in-out infinite">
+        <div style="position:absolute;inset:0;width:45%;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.35) 50%,transparent 65%);animation:bnSweep 7s ease-in-out infinite;pointer-events:none;mix-blend-mode:screen"></div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ showLibosHero }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:1280px;margin:0 auto;padding:24px 30px 0">
+    <div style="position:relative;overflow:hidden;border-radius:var(--r);background:linear-gradient(115deg,#EFE7DA 0%,#E7DBEA 55%,#E0CBD6 100%);display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));align-items:center;min-height:340px">
+      <div style="padding:clamp(26px,4%,48px);display:flex;flex-direction:column;gap:18px;z-index:2">
+        <span style="font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-deep)">{{ libosKicker }}</span>
+        <h2 style="font-size:clamp(26px,3.6vw,42px);line-height:1.1;color:var(--ink)">{{ libosTitle }}</h2>
+        <p style="font-size:15px;color:var(--ink-2);line-height:1.7;max-width:42ch">{{ libosSub }}</p>
+      </div>
+      <div style="position:relative;align-self:stretch;min-height:300px;overflow:hidden">
+        <img src="https://i.pinimg.com/736x/fe/11/25/fe1125ec7ad98fde596dbdf5ed7ada72.jpg" alt="Liboslar" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;animation:atirFloat 6s ease-in-out infinite">
+        <div style="position:absolute;inset:0;width:45%;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.32) 50%,transparent 65%);animation:bnSweep 7s ease-in-out infinite;pointer-events:none;mix-blend-mode:screen"></div>
+        <span style="position:absolute;left:16px;bottom:14px;font-family:var(--serif);font-weight:600;font-size:15px;letter-spacing:.02em;color:rgba(255,255,255,.92);text-shadow:0 1px 6px rgba(0,0,0,.45);pointer-events:none">Shop Uz Feruzaxon</span>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <div class="cat-body" style="max-width:1280px;margin:0 auto;padding:30px">
+    <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+      <aside class="cat-aside" style="flex:1 1 220px;max-width:250px;min-width:200px;position:sticky;top:104px;display:flex;flex-direction:column;gap:28px">
+        <div>
+          <div style="font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)">{{ catHead }}</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ categories }}" as="c" hint-placeholder-count="7">
+              <a href="{{ c.href }}" style="display:flex;align-items:center;gap:10px;font-size:14px;padding:5px 0;color:{{ c.color }};font-weight:{{ c.weight }}">
+                <span style="width:14px;height:14px;border-radius:50%;border:1.5px solid {{ c.ring }};display:grid;place-items:center;flex:none"><span style="width:7px;height:7px;border-radius:50%;background:{{ c.fill }}"></span></span>
+                <span style="flex:1">{{ c.label }}</span>
+                <span class="muted" style="font-size:12px">{{ c.n }}</span>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ showSizes }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)">{{ sizeHead }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <sc-for list="{{ sizes }}" as="s" hint-placeholder-count="6">
+                <span style="min-width:40px;text-align:center;padding:8px 10px;font-size:13px;cursor:pointer;border:1px solid {{ s.border }};color:{{ s.color }};background:{{ s.bg }}">{{ s.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showColor }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)">{{ colorHead }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:11px">
+              <sc-for list="{{ swatches }}" as="w" hint-placeholder-count="6">
+                <span title="{{ w.name }}" style="width:24px;height:24px;border-radius:50%;background:{{ w.hex }};cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14){{ w.ring }}"></span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showPrice }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <div style="font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)">{{ priceHead }}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input class="input" defaultValue="100 000" style="text-align:center;min-height:40px;padding:8px 6px">
+            <span class="muted">—</span>
+            <input class="input" defaultValue="900 000" style="text-align:center;min-height:40px;padding:8px 6px">
+          </div>
+          <div style="height:3px;background:var(--line);margin-top:16px;position:relative">
+            <div style="position:absolute;left:10%;right:32%;top:0;bottom:0;background:var(--accent)"></div>
+            <span style="position:absolute;left:10%;top:50%;width:14px;height:14px;border-radius:50%;background:#fff;border:1.5px solid var(--accent);transform:translate(-50%,-50%)"></span>
+            <span style="position:absolute;right:32%;top:50%;width:14px;height:14px;border-radius:50%;background:#fff;border:1.5px solid var(--accent);transform:translate(50%,-50%)"></span>
+          </div>
+        </div>
+        </sc-if>
+      </aside>
+
+      <div style="flex:3 1 480px;min-width:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid var(--line)">
+          <div></div>
+
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:26px 22px">
+          <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+            <dc-import name="ProductCard" slot-id="{{ p.id }}" img="{{ p.img }}" title="{{ p.title }}" price="{{ p.price }}" old-price="{{ p.oldPrice }}" rating="{{ p.rating }}" tags="{{ p.tags }}" color-dots="{{ p.colors }}" size-label="{{ p.sizeLabel }}" sizes="{{ p.sizes }}" tall="{{ p.tall }}" decant="{{ p.decant }}" hint-size="100%,560px"></dc-import>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:44px">
+          <button class="btn-icon" style="width:40px;height:40px;border:1px solid var(--line)">‹</button>
+          <button class="btn-icon" style="width:40px;height:40px;background:var(--ink);color:#fff">1</button>
+          <button class="btn-icon" style="width:40px;height:40px;border:1px solid var(--line)">2</button>
+          <button class="btn-icon" style="width:40px;height:40px;border:1px solid var(--line)">3</button>
+          <button class="btn-icon" style="width:40px;height:40px;border:1px solid var(--line)">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <dc-import name="StoreFooter" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  cat() { try { return new URLSearchParams(location.search).get("cat"); } catch (e) { return null; } }
+  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  renderVals() {
+    const R = this.lang() === "ru";
+    const sel = this.cat();
+    const BLK = "#1C1C1C", BLU = "#5B7C99", GRY = "#B7A99E", MUS = "#C99A3C", RED = "#C0392B", PNK = "#E79E96", GRN = "#7A8B5A", OLV = "#9B8654", CRM = "#E9E0D2", LIL = "#B49AC0";
+    const P = (uz, ru) => (R ? ru : uz);
+
+    const catDefs = [
+      { slug: "liboslar", uz: "Liboslar", ru: "Платья" },
+      { slug: "poyabzal", uz: "Poyabzal", ru: "Обувь" },
+      { slug: "atirlar", uz: "Atirlar", ru: "Парфюмерия" },
+      { slug: "choyshab", uz: "Choyshab to'plamlari", ru: "Комплекты белья" },
+      { slug: "ichki", uz: "Ichki kiyim", ru: "Нижнее бельё" },
+    ];
+
+    const pool = [
+      { id: "l1", cat: "liboslar", img: "assets/elivana.jpg", title: "Elivana", tall: true, sizes: ["44", "48"], price: "1 200 000", rating: 5, tags: [], colors: [] },
+      { id: "l2", cat: "liboslar", img: "assets/espira.jpg", title: "Espira", tall: true, sizes: ["42"], price: "1 000 000", rating: 5, tags: [], colors: [] },
+      { id: "l3", cat: "liboslar", img: "assets/libos3.jpg", title: P("Turkiya original", "Турция оригинал"), tall: true, sizes: ["46"], price: "500 000", rating: 5, tags: [{ label: "Hot", type: "hot" }], colors: [] },
+      { id: "l4", cat: "liboslar", img: "assets/daffic.jpg", title: "Daffic", tall: true, sizes: ["42"], price: "630 000", oldPrice: "700 000", rating: 5, tags: [{ label: "-10%", type: "sale" }], colors: [] },
+
+      { id: "p1", cat: "poyabzal", img: "assets/layki.jpg", tall: true, title: "Layki", sizeLabel: P("O'lcham: 37 · faqat 1 dona", "Размер: 37 · только 1 шт"), price: "393 000", rating: 5, tags: [{ label: R ? "Осталось 1 шт" : "1 dona qoldi", type: "hot" }], colors: [] },
+      { id: "p2", cat: "poyabzal", img: "assets/sharmiel.jpg", tall: true, title: "Şarmiel", sizeLabel: P("O'lcham: 40 · faqat 1 dona", "Размер: 40 · только 1 шт"), price: "150 000", oldPrice: "214 000", rating: 5, tags: [{ label: "-30%", type: "sale" }, { label: R ? "Осталось 1 шт" : "1 dona qoldi", type: "hot" }], colors: [] },
+      { id: "p3", cat: "poyabzal", img: "assets/layki2.jpg", tall: true, title: "Layki", sizeLabel: P("O'lcham: 37 · faqat 1 dona", "Размер: 37 · только 1 шт"), price: "370 000", rating: 5, tags: [{ label: R ? "Осталось 1 шт" : "1 dona qoldi", type: "hot" }], colors: [] },
+
+      { id: "a1", cat: "atirlar", title: "Miss Dior Blooming Bouquet", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "a2", cat: "atirlar", title: "My Way Nectar", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "a3", cat: "atirlar", title: "Miss Dior Parfum", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "a6", cat: "atirlar", title: "Louis Vuitton Imagination", sizeLabel: "100 ml", price: "460 000", rating: 5, tags: [{ label: R ? "Хит продаж" : "Bestseller", type: "hot" }], colors: [], decant: P("Quyib berish: 10 ml — 75 000 so'm", "На разлив: 10 мл — 75 000 сум") },
+      { id: "a7", cat: "atirlar", title: "Coco Mademoiselle Chanel", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "a8", cat: "atirlar", title: "Chanel Eau France", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "a9", cat: "atirlar", title: "Chanel Eau Tendre", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "a10", cat: "atirlar", title: "My Way Nacre", sizeLabel: "90 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+      { id: "a11", cat: "atirlar", title: "Hormone Gaba", sizeLabel: "100 ml", price: "370 000", rating: 5, tags: [], colors: [], decant: P("Quyib berish: 10 ml — 65 000 so'm", "На разлив: 10 мл — 65 000 сум") },
+
+
+      { id: "ch1", cat: "choyshab", img: "assets/marca-giovanni.jpg", title: "Marca Giovanni", sizeLabel: P("Turkiya · Qutisiz · Ko'rpajild 200/220, prostinya 240/260, 2 yostiqjild 50/70", "Турция · Без коробки · Пододеяльник 200/220, простыня 240/260, 2 наволочки 50/70"), price: "600 000", oldPrice: "900 000", rating: 5, tags: [{ label: "-30%", type: "sale" }, { label: R ? "Осталось 1 шт" : "1 dona qoldi", type: "hot" }], colors: [BLK, RED] },
+
+      { id: "ik1", cat: "ichki", img: "assets/victoria.jpg", title: "Victoria's Secret", sizeLabel: P("O'lcham: L · 1 pochkada 5 dona", "Размер: L · 5 шт в упаковке"), price: "160 000", rating: 5, tags: [{ label: "New", type: "new" }], colors: [] },
+      { id: "ik2", cat: "ichki", img: "assets/victoria2.jpg", title: "Victoria's Secret", sizeLabel: P("O'lcham: L · 1 pochkada 4 dona", "Размер: L · 4 шт в упаковке"), price: "100 000", rating: 5, tags: [], colors: [] },
+    ];
+
+    const counts = {};
+    catDefs.forEach((c) => (counts[c.slug] = pool.filter((p) => p.cat === c.slug).length));
+    const selDef = catDefs.find((c) => c.slug === sel) || null;
+    const products = selDef ? pool.filter((p) => p.cat === selDef.slug) : pool;
+    const dot = (on) => ({ ring: on ? "var(--accent)" : "var(--line-2)", fill: on ? "var(--accent)" : "transparent", color: on ? "var(--ink)" : "var(--ink-2)", weight: on ? 600 : 400 });
+
+    const allD = dot(!selDef);
+    const mkSize = (label, on) => ({ label, border: on ? "var(--ink)" : "var(--line-2)", color: on ? "#fff" : "var(--ink-2)", bg: on ? "var(--ink)" : "var(--surface)" });
+
+    return {
+      showPromo: !selDef,
+      showAtirHero: !!selDef && selDef.slug === "atirlar",
+      showLibosHero: !!selDef && selDef.slug === "liboslar",
+      libosKicker: R ? "Платья" : "Liboslar",
+      libosTitle: R ? "Турецкие платья" : "Turkiya liboslari",
+      libosSub: R ? "Элегантные вечерние и повседневные платья из Турции. Оригинальное качество." : "Turkiyadan nafis kechki va kundalik liboslar. Original sifat.",
+      atirKicker: R ? "Парфюмерия" : "Atirlar",
+      atirTitle: R ? "Люкс-копии ароматов из Турции" : "Turkiyadan kelgan Lux kopiya atirlari",
+      atirSub: R ? "Люкс-копии парфюмов по доступным ценам. Всегда ходите с уверенностью в себе!" : "Turkiyadan kelgan Lux kopiya atirlari hamyonbop narxlarda. Doim o'zingizga ishonch bilan yuring!",
+      promoKicker: R ? "Специальное предложение" : "Maxsus taklif",
+      promoTitle: R ? "Скидки на товары из Турции" : "Turkiyadan kelgan mahsulotlarga chegirma",
+      promoSub: R ? "Скидки до 10%, 30% и 50% на выбранные турецкие товары." : "Tanlangan Turkiya mahsulotlariga 10%, 30% va 50% gacha chegirma.",
+      promoWord: R ? "скидка" : "chegirma",
+      crumbHome: R ? "Главная" : "Bosh sahifa",
+      title: selDef ? (R ? selDef.ru : selDef.uz) : (R ? "Все товары" : "Barcha mahsulotlar"),
+      countLabel: (R ? products.length + " товаров" : products.length + " ta mahsulot"),
+      catHead: R ? "Категория" : "Kategoriya",
+      showSizes: !!selDef && selDef.slug !== "atirlar" && selDef.slug !== "choyshab" && selDef.slug !== "liboslar" && selDef.slug !== "ichki",
+      showColor: !!selDef && selDef.slug !== "atirlar" && selDef.slug !== "choyshab" && selDef.slug !== "poyabzal" && selDef.slug !== "liboslar" && selDef.slug !== "ichki",
+      showPrice: !!selDef && selDef.slug !== "atirlar" && selDef.slug !== "choyshab" && selDef.slug !== "poyabzal" && selDef.slug !== "liboslar" && selDef.slug !== "ichki",
+      sizeHead: R ? "Размер" : "O'lcham",
+      colorHead: R ? "Цвет" : "Rang",
+      priceHead: R ? "Цена, сум" : "Narx, so'm",
+      sortLabel: R ? "Сортировка:" : "Saralash:",
+      sortOptions: R ? ["Популярность", "Сначала дешёвые", "Сначала дорогие", "Новинки"] : ["Ommaboplik", "Arzondan qimmatga", "Qimmatdan arzonga", "Yangi kelganlar"],
+      allHref: "Catalog.dc.html",
+      allLabel: R ? "Все товары" : "Barcha mahsulotlar",
+      allColor: allD.color, allWeight: allD.weight, allRing: allD.ring, allFill: allD.fill,
+      hasChip: !!selDef,
+      categories: catDefs.map((c) => { const d = dot(selDef && selDef.slug === c.slug); return { label: R ? c.ru : c.uz, href: "Catalog.dc.html?cat=" + c.slug, n: counts[c.slug], color: d.color, weight: d.weight, ring: d.ring, fill: d.fill }; }),
+      sizes: (selDef && selDef.slug === "poyabzal")
+        ? Array.from({ length: 5 }, (_, i) => mkSize(String(36 + i), 36 + i === 37 || 36 + i === 38))
+        : Array.from({ length: 11 }, (_, i) => mkSize(String(36 + i * 2), 36 + i * 2 === 40 || 36 + i * 2 === 42)),
+      swatches: [
+        { name: R ? "Красный" : "Qizil", hex: "#C0392B", ring: ", 0 0 0 2px var(--accent)" },
+        { name: R ? "Чёрный" : "Qora", hex: "#1C1C1C", ring: "" },
+        { name: R ? "Розовый" : "Pushti", hex: "#E79E96", ring: "" },
+        { name: R ? "Синий" : "Ko'k", hex: "#5B7C99", ring: "" },
+        { name: R ? "Кремовый" : "Krem", hex: "#E9E0D2", ring: "" },
+        { name: R ? "Оливковый" : "Zaytun", hex: "#9B8654", ring: "" },
+      ],
+      products,
+    };
+  }
+}
+</script>
+</body>
+</html>

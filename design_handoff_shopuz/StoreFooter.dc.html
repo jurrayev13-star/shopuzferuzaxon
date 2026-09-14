@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+<style>
+@media (max-width:760px){
+  .foot-grid{ grid-template-columns:1fr 1fr !important; gap:28px !important; }
+  .foot-brand{ grid-column:1 / -1 !important; }
+  .foot-pad{ padding-left:18px !important; padding-right:18px !important; }
+}
+@media (max-width:420px){
+  .foot-grid{ grid-template-columns:1fr !important; }
+}
+</style>
+</helmet>
+<footer style="background:var(--bg-2);border-top:1px solid var(--line);margin-top:70px">
+  <div class="foot-pad" style="max-width:1280px;margin:0 auto;padding:56px 30px 22px">
+    <div class="foot-grid" style="display:grid;grid-template-columns:1.6fr repeat(2,1fr);gap:40px;margin-bottom:44px">
+      <div class="foot-brand" style="min-width:200px">
+        <div style="font-family:var(--serif);font-weight:600;font-size:26px;margin-bottom:14px">Shop Uz Feruzaxon<span style="color:var(--accent)">.</span></div>
+        <p class="muted" style="font-size:13.5px;line-height:1.75;max-width:36ch">{{ desc }}</p>
+      </div>
+      <sc-for list="{{ cols }}" as="col" hint-placeholder-count="2">
+        <div>
+          <div style="font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin-bottom:16px">{{ col.head }}</div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <sc-for list="{{ col.items }}" as="it" hint-placeholder-count="4">
+              <a href="{{ it.href }}" style="color:var(--ink-soft);font-size:13.5px">{{ it.label }}</a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center">
+      <span class="muted" style="font-size:12.5px">{{ copyright }}</span>
+    </div>
+  </div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  renderVals() {
+    const R = this.lang() === "ru";
+    return {
+      desc: R
+        ? "С любовью и заботой к каждому клиенту."
+        : "Har bir mijozga mehr muhabbat bilan.",
+      copyright: R ? "© 2026 Shop Uz Feruzaxon · Все права защищены" : "© 2026 Shop Uz Feruzaxon · Barcha huquqlar himoyalangan",
+      cash: R ? "Наличные" : "Naqd",
+      cols: R
+        ? [
+            { head: "Помощь", items: [{ label: "Таблица размеров", href: "Olcham.dc.html" }, { label: "Доставка", href: "Yetkazish.dc.html" }] },
+            { head: "Магазин", items: [{ label: "О нас", href: "Biz.dc.html" }, { label: "Адрес и часы работы", href: "Aloqa.dc.html" }, { label: "Контакты", href: "Aloqa.dc.html" }] },
+          ]
+        : [
+            { head: "Yordam", items: [{ label: "O'lcham jadvali", href: "Olcham.dc.html" }, { label: "Yetkazib berish", href: "Yetkazish.dc.html" }] },
+            { head: "Do'kon", items: [{ label: "Biz haqimizda", href: "Biz.dc.html" }, { label: "Manzil va ish vaqti", href: "Aloqa.dc.html" }, { label: "Bog'lanish", href: "Aloqa.dc.html" }] },
+          ],
+    };
+  }
+}
+</script>
+</body>
+</html>

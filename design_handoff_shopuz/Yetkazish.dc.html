@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="chic.css">
+</helmet>
+<div style="background:var(--bg);min-width:0;min-height:100%">
+  <dc-import name="StoreNav" active="" cart-count="2" hint-size="100%,84px"></dc-import>
+
+  <div style="max-width:760px;margin:0 auto;padding:48px 30px 12px;text-align:center">
+    <span class="kicker">{{ kicker }}</span>
+    <h1 style="font-size:clamp(30px,4.4vw,46px);margin-top:12px">{{ title }}</h1>
+    <p class="muted" style="font-size:14px;margin-top:10px;line-height:1.7">{{ subtitle }}</p>
+  </div>
+
+  <div style="max-width:820px;margin:0 auto;padding:20px 30px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px">
+      <div style="border:1px solid var(--line);border-radius:var(--r);padding:26px;display:flex;flex-direction:column;gap:14px">
+        <span style="display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--accent-100);color:var(--accent)"><svg width="24" height="24" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="15" stroke-linejoin="round" stroke-linecap="round"><path d="M16 176V64a8 8 0 0 1 8-8h120v120M144 96h40l32 40v40M64 200a24 24 0 1 0 48 0 24 24 0 0 0-48 0ZM160 200a24 24 0 1 0 48 0 24 24 0 0 0-48 0Z"/></svg></span>
+        <div>
+          <h3 style="font-size:20px;font-family:var(--sans);font-weight:600;margin-bottom:8px">{{ regionHead }}</h3>
+          <p style="font-size:14px;color:var(--ink-2);line-height:1.7">{{ regionBody }}</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px">
+          <span class="tag tag-outline" style="font-size:12px">BTS</span>
+          <span class="tag tag-outline" style="font-size:12px">FARGO</span>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--line);border-radius:var(--r);padding:26px;display:flex;flex-direction:column;gap:14px">
+        <span style="display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--accent-100);color:var(--accent)"><svg width="24" height="24" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="15" stroke-linejoin="round"><path d="M128 24a80 80 0 0 0-80 80c0 68 80 128 80 128s80-60 80-128a80 80 0 0 0-80-80Z"/><circle cx="128" cy="104" r="28"/></svg></span>
+        <div>
+          <h3 style="font-size:20px;font-family:var(--sans);font-weight:600;margin-bottom:8px">{{ tashHead }}</h3>
+          <p style="font-size:14px;color:var(--ink-2);line-height:1.7">{{ tashBody }}</p>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px">
+          <span style="font-family:var(--serif);font-weight:600;font-size:26px;color:var(--accent-deep)">30 000</span>
+          <span class="muted" style="font-size:13px">{{ som }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px;border-radius:var(--r);background:var(--bg-2);padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px">
+      <h3 style="font-size:20px">{{ ctaHead }}</h3>
+      <p class="muted" style="font-size:13.5px;max-width:46ch;line-height:1.65">{{ ctaBody }}</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <a href="tel:+998911919178" class="btn btn-primary" style="gap:8px"><svg width="16" height="16" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="16" stroke-linejoin="round"><path d="M92 60l16 40-24 16a72 72 0 0 0 36 36l16-24 40 16v36a16 16 0 0 1-16 16A136 136 0 0 1 40 72a16 16 0 0 1 16-16Z"/></svg>{{ callBtn }}</a>
+        <a href="https://t.me/ShopuzFeruza" target="_blank" rel="noopener" class="btn btn-secondary" style="gap:8px"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M228 44 26 122c-11 4-11 19 0 23l52 18 18 55c3 10 16 12 23 3l26-31 45 33c8 6 20 2 22-8l30-160c3-12-9-22-20-16Z"/></svg>Telegram</a>
+      </div>
+    </div>
+  </div>
+
+  <dc-import name="StoreFooter" hint-size="100%,260px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
+  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  renderVals() {
+    const R = this.lang() === "ru";
+    return {
+      kicker: R ? "Сервис" : "Xizmat",
+      title: R ? "Доставка" : "Yetkazib berish",
+      subtitle: R ? "Доставляем по всему Узбекистану и по Ташкенту в течение дня." : "O'zbekiston bo'ylab va Toshkent ichida kun davomida yetkazib beramiz.",
+      regionHead: R ? "По всему Узбекистану" : "O'zbekistonning barcha yeriga",
+      regionBody: R ? "Отправляем во все регионы через транспортные службы BTS и FARGO." : "Barcha viloyatlarga BTS va FARGO orqali jo'natamiz.",
+      tashHead: R ? "По Ташкенту" : "Toshkent shahri ichida",
+      tashBody: R ? "Доставка нашими курьерами в течение дня." : "Kuryerlarimiz orqali kun davomida yetkazib beriladi.",
+      som: R ? "сум" : "so'm",
+      ctaHead: R ? "Как оформить доставку?" : "Yetkazib berishni qanday rasmiylashtiraman?",
+      ctaBody: R ? "Для оформления доставки свяжитесь с администратором — поможем и подскажем." : "Yetkazib berishni rasmiylashtirish uchun admin bilan aloqaga chiqing — yordam beramiz.",
+      callBtn: R ? "Позвонить админу" : "Adminga qo'ng'iroq",
+    };
+  }
+}
+</script>
+</body>
+</html>

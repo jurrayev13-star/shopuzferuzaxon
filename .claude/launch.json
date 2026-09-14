@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "shopuz-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "http-server", "design_handoff_shopuz", "-p", "5173", "-c-1", "--cors"],
+      "port": 5173
+    }
+  ]
+}
