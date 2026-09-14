@@ -21,6 +21,30 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "shopuzferuzaxon", ts: Date.now() });
 });
 
+app.get("/api/_debug/paths", async (_req, res) => {
+  try {
+    const { readdirSync, statSync } = await import("node:fs");
+    function safeList(dir) {
+      try {
+        return readdirSync(dir).slice(0, 40).map((n) => {
+          try {
+            const st = statSync(path.join(dir, n));
+            return { name: n, dir: st.isDirectory(), size: st.size };
+          } catch { return { name: n, err: 1 }; }
+        });
+      } catch (e) { return { error: e.message }; }
+    }
+    res.json({
+      cwd: process.cwd(),
+      __dirname,
+      APP_DIR,
+      LEGACY_DIR,
+      appExists: safeList(APP_DIR),
+      legacyExists: safeList(LEGACY_DIR),
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.use("/api/products", productsRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/orders", ordersRouter);
