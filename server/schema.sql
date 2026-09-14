@@ -22,12 +22,15 @@ CREATE INDEX IF NOT EXISTS products_category_idx ON products (category);
 CREATE INDEX IF NOT EXISTS products_featured_idx ON products (featured);
 
 CREATE TABLE IF NOT EXISTS users (
-  id          BIGSERIAL PRIMARY KEY,
-  phone       TEXT UNIQUE NOT NULL,
-  name        TEXT,
-  is_admin    BOOLEAN NOT NULL DEFAULT FALSE,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id            BIGSERIAL PRIMARY KEY,
+  phone         TEXT UNIQUE NOT NULL,
+  name          TEXT,
+  password_hash TEXT,
+  is_admin      BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
 
 CREATE TABLE IF NOT EXISTS sms_codes (
   phone       TEXT PRIMARY KEY,

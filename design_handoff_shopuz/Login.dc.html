@@ -33,27 +33,43 @@
 
         <p class="muted" style="font-size:13.5px;line-height:1.6">{{ intro }}</p>
 
-        <!-- STEP: phone -->
-        <sc-if value="{{ stepPhone }}" hint-placeholder-val="{{ true }}">
-          <sc-if value="{{ isRegister }}" hint-placeholder-val="{{ false }}">
-            <div class="field">
-              <label>{{ nameLabel }}</label>
-              <input class="input" value="{{ name }}" onInput="{{ onName }}" placeholder="{{ namePh }}" style="font-family:var(--sans);font-size:14px">
-            </div>
-          </sc-if>
+        <!-- LOGIN mode: telefon + parol -->
+        <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
           <div class="field">
             <label>{{ phoneLabel }}</label>
             <div class="input" style="display:flex;align-items:center;gap:10px;padding:0 14px">
               <span style="font-weight:500;color:var(--ink-2);border-right:1px solid var(--line-2);padding-right:10px">+998</span>
               <input type="tel" value="{{ phone }}" onInput="{{ onPhone }}" placeholder="90 123 45 67" style="border:0;background:transparent;color:inherit;font:inherit;font-family:var(--sans);font-size:14px;width:100%;outline:none;padding:12px 0">
             </div>
-            <sc-if value="{{ phoneError }}" hint-placeholder-val="{{ false }}"><p style="color:var(--accent);font-size:11.5px;margin-top:8px">{{ phoneError }}</p></sc-if>
           </div>
+          <div class="field">
+            <label>{{ passwordLabel }}</label>
+            <input class="input" type="password" value="{{ password }}" onInput="{{ onPassword }}" placeholder="{{ passwordPh }}" style="font-family:var(--sans);font-size:14px">
+          </div>
+          <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}"><p style="color:var(--accent);font-size:11.5px;margin-top:-8px">{{ formError }}</p></sc-if>
+          <button onClick="{{ doLogin }}" class="btn btn-primary btn-block" style="padding:16px;border:none;cursor:pointer">{{ loginBtn }}</button>
+          <p class="muted" style="font-size:12px;text-align:center;margin-top:-4px">{{ noAccount }} <a href="#" onClick="{{ setRegister }}" style="border-bottom:1px solid var(--ink);color:var(--ink)">{{ registerHere }}</a></p>
+        </sc-if>
+
+        <!-- REGISTER step 1: ism + telefon → kod olish -->
+        <sc-if value="{{ regStepPhone }}" hint-placeholder-val="{{ false }}">
+          <div class="field">
+            <label>{{ nameLabel }}</label>
+            <input class="input" value="{{ name }}" onInput="{{ onName }}" placeholder="{{ namePh }}" style="font-family:var(--sans);font-size:14px">
+          </div>
+          <div class="field">
+            <label>{{ phoneLabel }}</label>
+            <div class="input" style="display:flex;align-items:center;gap:10px;padding:0 14px">
+              <span style="font-weight:500;color:var(--ink-2);border-right:1px solid var(--line-2);padding-right:10px">+998</span>
+              <input type="tel" value="{{ phone }}" onInput="{{ onPhone }}" placeholder="90 123 45 67" style="border:0;background:transparent;color:inherit;font:inherit;font-family:var(--sans);font-size:14px;width:100%;outline:none;padding:12px 0">
+            </div>
+          </div>
+          <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}"><p style="color:var(--accent);font-size:11.5px;margin-top:-8px">{{ formError }}</p></sc-if>
           <button onClick="{{ sendCode }}" class="btn btn-primary btn-block" style="padding:16px;border:none;cursor:pointer">{{ sendBtn }}</button>
         </sc-if>
 
-        <!-- STEP: code -->
-        <sc-if value="{{ stepCode }}" hint-placeholder-val="{{ false }}">
+        <!-- REGISTER step 2: kod + parol yaratish -->
+        <sc-if value="{{ regStepCode }}" hint-placeholder-val="{{ false }}">
           <div class="field">
             <label>{{ smsLabel }}</label>
             <div style="display:flex;gap:9px">
@@ -63,9 +79,14 @@
             </div>
             <p class="muted" style="font-size:11.5px;margin-top:10px">{{ sentTo }} · <a href="#" onClick="{{ resend }}">{{ resendLabel }}</a></p>
             <div style="margin-top:10px;padding:10px 12px;background:var(--bg-2);font-size:11.5px;color:var(--ink-2)">{{ demoHint }} <b style="letter-spacing:3px;font-family:var(--serif)">{{ demoCode }}</b></div>
-            <sc-if value="{{ codeError }}" hint-placeholder-val="{{ false }}"><p style="color:var(--accent);font-size:11.5px;margin-top:8px">{{ codeError }}</p></sc-if>
           </div>
-          <button onClick="{{ verify }}" class="btn btn-primary btn-block" style="padding:16px;border:none;cursor:pointer">{{ verifyBtn }}</button>
+          <div class="field">
+            <label>{{ newPasswordLabel }}</label>
+            <input class="input" type="password" value="{{ password }}" onInput="{{ onPassword }}" placeholder="{{ newPasswordPh }}" style="font-family:var(--sans);font-size:14px">
+            <p class="muted" style="font-size:11px;margin-top:6px">{{ passwordHint }}</p>
+          </div>
+          <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}"><p style="color:var(--accent);font-size:11.5px;margin-top:-8px">{{ formError }}</p></sc-if>
+          <button onClick="{{ doRegister }}" class="btn btn-primary btn-block" style="padding:16px;border:none;cursor:pointer">{{ registerBtn }}</button>
           <button onClick="{{ backToPhone }}" class="btn btn-ghost" style="align-self:center;border:none;background:none;cursor:pointer">← {{ changeNumber }}</button>
         </sc-if>
 
@@ -88,7 +109,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { mode: "login", step: "phone", name: "", phone: "", code: ["", "", "", "", ""], demo: "", phoneError: "", codeError: "" };
+  state = { mode: "login", step: "phone", name: "", phone: "", password: "", code: ["", "", "", "", ""], demo: "", formError: "" };
   refs = [];
   lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
   componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
@@ -108,115 +129,175 @@ class Component extends DCLogic {
     return "+998 " + (d.slice(0, 2) || "90") + " *** " + (d.slice(7, 9) || "**");
   }
 
+  onName(e) { this.setState({ name: e.target.value.slice(0, 60), formError: "" }); }
+  onPhone(e) { this.setState({ phone: this.fmtPhone(this.digits(e.target.value)), formError: "" }); }
+  onPassword(e) { this.setState({ password: e.target.value.slice(0, 60), formError: "" }); }
+
+  setLogin(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    this.setState({ mode: "login", step: "phone", password: "", code: ["", "", "", "", ""], formError: "" });
+  }
+  setRegister(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    this.setState({ mode: "register", step: "phone", password: "", code: ["", "", "", "", ""], formError: "" });
+  }
+
+  saveUser(user) {
+    try { localStorage.setItem("suf_user", JSON.stringify({ name: user.name || "Mijoz", phone: user.phone })); } catch (e) {}
+    if (user.is_admin) { try { localStorage.setItem("suf_admin", "1"); } catch (e) {} }
+    window.dispatchEvent(new CustomEvent("suf-auth"));
+    let redirect = "Home.dc.html";
+    try {
+      const rt = localStorage.getItem("suf_return_to");
+      if (rt) { redirect = rt; localStorage.removeItem("suf_return_to"); }
+    } catch (e) {}
+    window.location.href = redirect;
+  }
+
+  doLogin() {
+    const R = this.lang() === "ru";
+    const d = this.digits(this.state.phone);
+    if (d.length < 9) { this.setState({ formError: R ? "Введите 9 цифр номера" : "Raqamning 9 ta raqamini kiriting" }); return; }
+    if (!this.state.password) { this.setState({ formError: R ? "Введите пароль" : "Parolni kiriting" }); return; }
+    const phone = "+998" + d;
+    fetch("/api/auth/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, password: this.state.password })
+    }).then(r => r.json().then(j => ({ status: r.status, body: j })))
+      .then(({ status, body }) => {
+        if (status === 200 && body.ok) { this.saveUser(body.user); return; }
+        const map = {
+          not_registered: R ? "Этот номер не зарегистрирован. Сначала зарегистрируйтесь." : "Bu raqam ro'yxatdan o'tmagan. Avval ro'yxatdan o'ting.",
+          wrong_password: R ? "Неверный пароль" : "Parol noto'g'ri",
+          bad_request: R ? "Неверные данные" : "Ma'lumotlar noto'g'ri",
+        };
+        this.setState({ formError: map[body.error] || (R ? "Ошибка входа" : "Kirishda xatolik") });
+      })
+      .catch(() => this.setState({ formError: R ? "Сеть недоступна" : "Tarmoq mavjud emas" }));
+  }
+
   sendCode() {
     const R = this.lang() === "ru";
     const d = this.digits(this.state.phone);
-    if (d.length < 9) { this.setState({ phoneError: R ? "Введите 9 цифр номера" : "Raqamning 9 ta raqamini kiriting" }); return; }
-    if (this.state.mode === "register" && !this.state.name.trim()) { this.setState({ phoneError: R ? "Введите имя" : "Ismingizni kiriting" }); return; }
+    if (d.length < 9) { this.setState({ formError: R ? "Введите 9 цифр номера" : "Raqamning 9 ta raqamini kiriting" }); return; }
+    if (!this.state.name.trim()) { this.setState({ formError: R ? "Введите имя" : "Ismingizni kiriting" }); return; }
     const phone = "+998" + d;
     fetch("/api/auth/send-code", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ phone })
-    }).then(r => r.json()).then(res => {
-      if (!res || !res.ok) { this.setState({ phoneError: R ? "Ошибка отправки кода" : "Kod jo'natishda xatolik" }); return; }
-      this.setState({ step: "code", demo: res.demoCode || "", code: ["", "", "", "", ""], phoneError: "", codeError: "" });
-      setTimeout(() => { if (this.refs[0]) this.refs[0].focus(); }, 30);
-    }).catch(() => {
-      const demo = String(Math.floor(10000 + Math.random() * 90000));
-      this.setState({ step: "code", demo, code: ["", "", "", "", ""], phoneError: "", codeError: "" });
-      setTimeout(() => { if (this.refs[0]) this.refs[0].focus(); }, 30);
-    });
+    }).then(r => r.json().then(j => ({ status: r.status, body: j })))
+      .then(({ status, body }) => {
+        if (status === 200 && body.ok) {
+          this.setState({ step: "code", demo: body.demoCode || "", code: ["", "", "", "", ""], password: "", formError: "" });
+          setTimeout(() => { if (this.refs[0]) this.refs[0].focus(); }, 30);
+          return;
+        }
+        const map = {
+          already_registered: R ? "Этот номер уже зарегистрирован. Войдите вместо регистрации." : "Bu raqam ro'yxatda bor. Ro'yxat o'rniga kiring.",
+          invalid_phone: R ? "Неверный номер" : "Raqam noto'g'ri",
+        };
+        this.setState({ formError: map[body.error] || (R ? "Ошибка отправки кода" : "Kod jo'natishda xatolik") });
+      })
+      .catch(() => this.setState({ formError: R ? "Сеть недоступна" : "Tarmoq mavjud emas" }));
   }
+
   onCode(e) {
     const idx = parseInt(e.target.getAttribute("data-idx"), 10);
     const v = this.digits(e.target.value).slice(-1);
     const code = this.state.code.slice();
     code[idx] = v;
-    this.setState({ code, codeError: "" });
+    this.setState({ code, formError: "" });
     if (v && idx < 4 && this.refs[idx + 1]) this.refs[idx + 1].focus();
   }
   onCodeKey(e) {
     const idx = parseInt(e.target.getAttribute("data-idx"), 10);
     if (e.key === "Backspace" && !this.state.code[idx] && idx > 0 && this.refs[idx - 1]) this.refs[idx - 1].focus();
   }
-  verify() {
+
+  doRegister() {
     const R = this.lang() === "ru";
     const entered = this.state.code.join("");
-    if (entered.length < 5) { this.setState({ codeError: R ? "Введите 5-значный код" : "5 xonali kodni kiriting" }); return; }
+    if (entered.length < 5) { this.setState({ formError: R ? "Введите 5-значный код" : "5 xonali kodni kiriting" }); return; }
+    if (!this.state.password || this.state.password.length < 6) { this.setState({ formError: R ? "Пароль минимум 6 символов" : "Parol kamida 6 belgi" }); return; }
     const phone = "+998" + this.digits(this.state.phone);
-    const name = this.state.name.trim() || null;
-    fetch("/api/auth/verify", {
+    fetch("/api/auth/register", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone, code: entered, name })
+      body: JSON.stringify({ phone, code: entered, password: this.state.password, name: this.state.name.trim() })
     }).then(r => r.json().then(j => ({ status: r.status, body: j })))
       .then(({ status, body }) => {
-        if (status !== 200 || !body.ok) {
-          const msg = body && body.error === "wrong_code"
-            ? (R ? "Неверный код, попробуйте снова" : "Kod noto'g'ri, qayta urinib ko'ring")
-            : (R ? "Ошибка проверки кода" : "Kodni tekshirishda xatolik");
-          this.setState({ codeError: msg });
-          return;
-        }
-        const user = { name: body.user.name || (R ? "Клиент" : "Mijoz"), phone: body.user.phone };
-        try { localStorage.setItem("suf_user", JSON.stringify(user)); } catch (e) {}
-        if (body.user.is_admin) { try { localStorage.setItem("suf_admin", "1"); } catch (e) {} }
-        window.dispatchEvent(new CustomEvent("suf-auth"));
-        window.location.href = "Home.dc.html";
+        if (status === 200 && body.ok) { this.saveUser(body.user); return; }
+        const map = {
+          wrong_code: R ? "Неверный код" : "Kod noto'g'ri",
+          code_expired: R ? "Код истёк, отправьте новый" : "Kod eskirgan, yangisini oling",
+          no_code: R ? "Сначала запросите код" : "Avval kod oling",
+          too_many_attempts: R ? "Слишком много попыток" : "Juda ko'p urinish",
+          weak_password: R ? "Пароль минимум 6 символов" : "Parol kamida 6 belgi",
+          already_registered: R ? "Этот номер уже зарегистрирован" : "Bu raqam ro'yxatda bor",
+          bad_request: R ? "Заполните все поля" : "Barcha maydonlarni to'ldiring",
+        };
+        this.setState({ formError: map[body.error] || (R ? "Ошибка регистрации" : "Ro'yxatdan o'tishda xatolik") });
       })
-      .catch(() => {
-        if (entered !== this.state.demo) { this.setState({ codeError: R ? "Неверный код, попробуйте снова" : "Kod noto'g'ri, qayta urinib ko'ring" }); return; }
-        const user = { name: this.state.name.trim() || (R ? "Клиент" : "Mijoz"), phone };
-        try { localStorage.setItem("suf_user", JSON.stringify(user)); } catch (e) {}
-        window.dispatchEvent(new CustomEvent("suf-auth"));
-        window.location.href = "Home.dc.html";
-      });
+      .catch(() => this.setState({ formError: R ? "Сеть недоступна" : "Tarmoq mavjud emas" }));
   }
-  backToPhone() { this.setState({ step: "phone", codeError: "" }); }
+
+  backToPhone() { this.setState({ step: "phone", code: ["", "", "", "", ""], password: "", formError: "" }); }
   resend(e) { if (e && e.preventDefault) e.preventDefault(); this.sendCode(); }
 
   renderVals() {
     const R = this.lang() === "ru";
+    const isLogin = this.state.mode === "login";
     const isReg = this.state.mode === "register";
+    const regStepPhone = isReg && this.state.step === "phone";
+    const regStepCode = isReg && this.state.step === "code";
     return {
       heroText: R ? "Войдите — корзина, заказы и избранное в одном месте." : "Kiring — savatingiz, buyurtmalaringiz va sevimlilaringiz bir joyda.",
-      tabLogin: R ? "Вход" : "Kirish",
+      tabLogin: R ? "Войти" : "Kirish",
       tabRegister: R ? "Регистрация" : "Ro'yxatdan o'tish",
-      loginColor: isReg ? "var(--ink-soft)" : "var(--ink)",
+      loginColor: isLogin ? "var(--ink)" : "var(--ink-soft)",
       regColor: isReg ? "var(--ink)" : "var(--ink-soft)",
-      loginBorder: isReg ? "none" : "1.5px solid var(--accent)",
-      regBorder: isReg ? "1.5px solid var(--accent)" : "none",
-      setLogin: () => this.setState({ mode: "login", step: "phone", phoneError: "", codeError: "" }),
-      setRegister: () => this.setState({ mode: "register", step: "phone", phoneError: "", codeError: "" }),
-      isRegister: isReg,
-      intro: this.state.step === "code"
-        ? (R ? "Мы отправили код на ваш номер." : "Raqamingizga kod yubordik.")
-        : (isReg
-            ? (R ? "Создайте аккаунт — введите имя и номер телефона." : "Hisob yarating — ism va telefon raqamingizni kiriting.")
-            : (R ? "Введите номер телефона — подтвердим по SMS." : "Telefon raqamingizni kiriting — SMS orqali tasdiqlaymiz.")),
-      stepPhone: this.state.step === "phone",
-      stepCode: this.state.step === "code",
-      nameLabel: R ? "Имя" : "Ism",
-      namePh: R ? "Ваше имя" : "Ismingiz",
+      loginBorder: isLogin ? "2px solid var(--ink)" : "0",
+      regBorder: isReg ? "2px solid var(--ink)" : "0",
+      intro: isLogin
+        ? (R ? "Введите номер и пароль для входа в аккаунт." : "Akkauntingizga kirish uchun raqam va parolni kiriting.")
+        : (R ? "Мы отправим 5-значный код на ваш телефон, затем создадите пароль." : "Sizga 5 xonali kod yuboramiz, so'ng parol yaratasiz."),
+      isLogin,
+      regStepPhone,
+      regStepCode,
+      nameLabel: R ? "Имя" : "Ismingiz",
+      namePh: R ? "Как к вам обращаться?" : "Sizni qanday chaqiraylik?",
       name: this.state.name,
-      onName: (e) => this.setState({ name: e.target.value }),
-      phoneLabel: R ? "Номер телефона" : "Telefon raqam",
+      onName: (e) => this.onName(e),
+      phoneLabel: R ? "Номер телефона" : "Telefon raqami",
       phone: this.state.phone,
-      onPhone: (e) => this.setState({ phone: this.fmtPhone(this.digits(e.target.value)), phoneError: "" }),
-      phoneError: this.state.phoneError,
-      sendBtn: R ? "Получить код" : "Kodni yuborish",
-      smsLabel: R ? "SMS код" : "SMS kod",
-      codeBoxes: this.state.code.map((v, i) => ({ v, idx: i, ref: (el) => { this.refs[i] = el; } })),
+      onPhone: (e) => this.onPhone(e),
+      passwordLabel: R ? "Пароль" : "Parol",
+      passwordPh: R ? "Ваш пароль" : "Parolingiz",
+      newPasswordLabel: R ? "Придумайте пароль" : "Yangi parol",
+      newPasswordPh: R ? "Минимум 6 символов" : "Kamida 6 belgi",
+      passwordHint: R ? "Придумайте пароль, который запомните." : "Esda qoladigan parol tanlang.",
+      password: this.state.password,
+      onPassword: (e) => this.onPassword(e),
+      formError: this.state.formError,
+      loginBtn: R ? "Войти" : "Kirish",
+      sendBtn: R ? "Отправить код" : "Kodni yuborish",
+      registerBtn: R ? "Зарегистрироваться" : "Ro'yxatdan o'tish",
+      doLogin: () => this.doLogin(),
+      sendCode: () => this.sendCode(),
+      doRegister: () => this.doRegister(),
+      setLogin: (e) => this.setLogin(e),
+      setRegister: (e) => this.setRegister(e),
+      backToPhone: () => this.backToPhone(),
+      noAccount: R ? "Нет аккаунта?" : "Akkauntingiz yo'qmi?",
+      registerHere: R ? "Зарегистрироваться" : "Ro'yxatdan o'tish",
+      smsLabel: R ? "Код из SMS" : "SMS kod",
+      codeBoxes: [0, 1, 2, 3, 4].map((idx) => ({ idx, v: this.state.code[idx] || "", ref: (el) => (this.refs[idx] = el) })),
       onCode: (e) => this.onCode(e),
       onCodeKey: (e) => this.onCodeKey(e),
-      sentTo: (R ? "Код отправлен на " : "Kod ") + this.maskedPhone() + (R ? "" : " raqamiga yuborildi"),
+      sentTo: (R ? "Код отправлен на " : "Kod jo'natildi: ") + this.maskedPhone(),
       resendLabel: R ? "Отправить снова" : "Qayta yuborish",
       resend: (e) => this.resend(e),
       demoHint: R ? "Демо-код:" : "Demo kod:",
       demoCode: this.state.demo,
-      codeError: this.state.codeError,
-      verifyBtn: R ? "Подтвердить и войти" : "Tasdiqlash va kirish",
-      verify: () => this.verify(),
-      backToPhone: () => this.backToPhone(),
       changeNumber: R ? "Изменить номер" : "Raqamni o'zgartirish",
       orLabel: R ? "ИЛИ" : "YOKI",
       tgBtn: R ? "Продолжить через Telegram" : "Telegram orqali davom etish",
