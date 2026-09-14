@@ -161,10 +161,39 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
+  state = { dbProducts: null, dbError: "" };
   lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
   cat() { try { return new URLSearchParams(location.search).get("cat"); } catch (e) { return null; } }
-  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentDidMount() {
+    this._lh = () => this.forceUpdate();
+    window.addEventListener("suf-lang", this._lh);
+    this._loadProducts();
+  }
   componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  _loadProducts() {
+    fetch("/api/products").then(r => r.json()).then(res => {
+      this.setState({ dbProducts: Array.isArray(res.items) ? res.items : [], dbError: "" });
+    }).catch((e) => this.setState({ dbProducts: [], dbError: String(e && e.message || e) }));
+  }
+  _fmtPrice(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+  _mapDb(p, R) {
+    const title = R ? (p.title_ru || p.title_uz) : (p.title_uz || p.title_ru);
+    const img = (p.images && p.images[0]) || "";
+    const tall = p.category === "liboslar" || p.category === "poyabzal";
+    const sizes = Array.isArray(p.sizes) ? p.sizes : [];
+    const sizeLabel = sizes.length && (p.category === "poyabzal" || p.category === "choyshab" || p.category === "ichki")
+      ? (R ? "Размер: " : "O'lcham: ") + sizes[0]
+      : "";
+    return {
+      id: p.id, cat: p.category, img, title,
+      tall, sizes, sizeLabel,
+      price: this._fmtPrice(p.price),
+      oldPrice: p.old_price ? this._fmtPrice(p.old_price) : undefined,
+      rating: p.rating || 5,
+      tags: (p.tags || []).map((t) => ({ label: t, type: t.toLowerCase() === "sale" ? "sale" : t.toLowerCase() === "hot" ? "hot" : t.toLowerCase() === "new" ? "new" : "outline" })),
+      colors: p.colors || [],
+    };
+  }
   renderVals() {
     const R = this.lang() === "ru";
     const sel = this.cat();
@@ -179,7 +208,8 @@ class Component extends DCLogic {
       { slug: "ichki", uz: "Ichki kiyim", ru: "Нижнее бельё" },
     ];
 
-    const pool = [
+    const dbList = Array.isArray(this.state.dbProducts) ? this.state.dbProducts.map((p) => this._mapDb(p, R)) : null;
+    const staticPool = [
       { id: "l1", cat: "liboslar", img: "assets/elivana.jpg", title: "Elivana", tall: true, sizes: ["44", "48"], price: "1 200 000", rating: 5, tags: [], colors: [] },
       { id: "l2", cat: "liboslar", img: "assets/espira.jpg", title: "Espira", tall: true, sizes: ["42"], price: "1 000 000", rating: 5, tags: [], colors: [] },
       { id: "l3", cat: "liboslar", img: "assets/libos3.jpg", title: P("Turkiya original", "Турция оригинал"), tall: true, sizes: ["46"], price: "500 000", rating: 5, tags: [{ label: "Hot", type: "hot" }], colors: [] },
@@ -207,9 +237,11 @@ class Component extends DCLogic {
     ];
 
     const counts = {};
+    const pool = dbList && dbList.length ? dbList : staticPool;
     catDefs.forEach((c) => (counts[c.slug] = pool.filter((p) => p.cat === c.slug).length));
     const selDef = catDefs.find((c) => c.slug === sel) || null;
     const products = selDef ? pool.filter((p) => p.cat === selDef.slug) : pool;
+    const isLoading = this.state.dbProducts === null;
     const dot = (on) => ({ ring: on ? "var(--accent)" : "var(--line-2)", fill: on ? "var(--accent)" : "transparent", color: on ? "var(--ink)" : "var(--ink-2)", weight: on ? 600 : 400 });
 
     const allD = dot(!selDef);

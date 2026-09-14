@@ -128,14 +128,27 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
+  state = { dbProd: null };
   lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
   pid() { try { return new URLSearchParams(location.search).get("id"); } catch (e) { return null; } }
-  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentDidMount() {
+    this._lh = () => this.forceUpdate();
+    window.addEventListener("suf-lang", this._lh);
+    const id = this.pid();
+    if (id) {
+      fetch("/api/products/" + encodeURIComponent(id))
+        .then(r => r.ok ? r.json() : null)
+        .then(p => this.setState({ dbProd: p || undefined }))
+        .catch(() => this.setState({ dbProd: undefined }));
+    }
+  }
   componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  _fmtPrice(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
   renderVals() {
     const R = this.lang() === "ru";
     const P = (uz, ru) => (R ? ru : uz);
     const cur = R ? " сум" : " so'm";
+    const catNames = { liboslar: P("Liboslar", "Платья"), poyabzal: P("Poyabzal", "Обувь"), atirlar: P("Atirlar", "Парфюмерия"), choyshab: P("Choyshab", "Комплекты"), ichki: P("Ichki kiyim", "Нижнее бельё") };
     const BLK = "#1C1C1C", BLU = "#5B7C99", GRY = "#B7A99E", RED = "#C0392B", PNK = "#E79E96", CRM = "#E9E0D2", LIL = "#B49AC0";
 
     const DB = {
@@ -156,7 +169,25 @@ class Component extends DCLogic {
         desc: P("Payetka bilan bezatilgan kechki libos — bayram va maxsus tadbirlar uchun. Yumshoq astar, qulay kesim.", "Вечернее платье с пайетками — для праздников и особых случаев. Мягкая подкладка, удобный крой."),
       },
     };
-    const prod = DB[this.pid()] || DB.default;
+    let prod = DB[this.pid()] || DB.default;
+    const dp = this.state.dbProd;
+    if (dp) {
+      const isPerf = dp.category === "atirlar";
+      prod = {
+        perfume: isPerf,
+        slot: "pd-" + (dp.id || "main"),
+        badge: (dp.tags && dp.tags[0]) || (dp.old_price ? "Sale" : ""),
+        cat: catNames[dp.category] || dp.category,
+        catHref: "Catalog.dc.html?cat=" + dp.category,
+        title: R ? (dp.title_ru || dp.title_uz) : (dp.title_uz || dp.title_ru),
+        price: this._fmtPrice(dp.price),
+        oldPrice: dp.old_price ? this._fmtPrice(dp.old_price) : null,
+        desc: R ? (dp.description_ru || dp.description_uz || "") : (dp.description_uz || dp.description_ru || ""),
+        image: (dp.images && dp.images[0]) || null,
+        sizes: Array.isArray(dp.sizes) ? dp.sizes : [],
+        volumes: isPerf ? [{ label: "100 ml", price: this._fmtPrice(dp.price) + cur, on: true }] : null,
+      };
+    }
 
     const mkSize = (label, state) => {
       if (state === "off") return { label, cursor: "not-allowed", border: "var(--line)", color: "var(--ink-soft)", bg: "var(--surface)", extra: "text-decoration:line-through;opacity:.55" };

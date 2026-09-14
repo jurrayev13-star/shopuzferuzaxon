@@ -9,26 +9,103 @@
 <x-dc>
 <helmet>
 <link rel="stylesheet" href="chic.css">
+<style>
+  .adm-table{width:100%;border-collapse:collapse;font-size:13px}
+  .adm-table th{text-align:left;font-weight:500;color:var(--ink-2);padding:10px 12px;border-bottom:1px solid var(--line-2);text-transform:uppercase;font-size:11px;letter-spacing:.05em}
+  .adm-table td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top}
+  .adm-status{display:inline-block;padding:4px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-radius:3px}
+  .adm-status.new{background:var(--accent-100);color:var(--accent-deep)}
+  .adm-status.processing{background:#FFF4E5;color:#8A5A00}
+  .adm-status.shipped{background:#E5F0FF;color:#1E4A8A}
+  .adm-status.done{background:#EAEAEA;color:var(--ink-2)}
+  .adm-status.cancelled{background:#FDECEC;color:var(--sale)}
+</style>
 </helmet>
 <div style="background:var(--bg);min-width:0;min-height:100vh;display:flex;flex-direction:column">
-  <dc-import name="StoreNav" active="" cart-count="2" hint-size="100%,84px"></dc-import>
+  <dc-import name="StoreNav" active="" cart-count="0" hint-size="100%,84px"></dc-import>
 
-  <div style="flex:1;display:grid;place-items:center;padding:60px 30px">
-    <div style="max-width:460px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px">
-      <span style="display:grid;place-items:center;width:72px;height:72px;border-radius:50%;background:var(--accent-100);color:var(--accent)"><svg width="34" height="34" viewBox="0 0 256 256" fill="none" stroke="currentColor" stroke-width="14" stroke-linejoin="round"><rect x="40" y="112" width="176" height="104" rx="12"/><path d="M84 112V80a44 44 0 0 1 88 0v32"/><circle cx="128" cy="160" r="14"/></svg></span>
-      <span class="kicker">{{ kicker }}</span>
-      <h1 style="font-size:clamp(30px,4.6vw,46px)">{{ title }}</h1>
-      <p style="font-size:15px;color:var(--ink-2);line-height:1.7">{{ body }}</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px">
-        <span class="tag tag-outline">{{ t1 }}</span>
-        <span class="tag tag-outline">{{ t2 }}</span>
-        <span class="tag tag-outline">{{ t3 }}</span>
-        <span class="tag tag-outline">{{ t4 }}</span>
+  <div style="flex:1;max-width:1200px;width:100%;margin:0 auto;padding:32px 30px 60px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+      <div>
+        <span class="kicker">{{ kicker }}</span>
+        <h1 style="font-size:32px;margin-top:8px">{{ title }}</h1>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px">
-        <a href="Home.dc.html" class="btn btn-primary">{{ backBtn }}</a>
-        <button onClick="{{ logout }}" class="btn btn-secondary">{{ logoutBtn }}</button>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <sc-if value="{{ hasToken }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ reload }}" class="btn btn-secondary" style="cursor:pointer">{{ reloadBtn }}</button>
+          <button onClick="{{ logoutToken }}" class="btn btn-ghost" style="cursor:pointer;border:1px solid var(--line-2)">{{ clearToken }}</button>
+        </sc-if>
       </div>
+    </div>
+
+    <!-- Token kiritish -->
+    <sc-if value="{{ needToken }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:520px;background:var(--surface);border:1px solid var(--line);padding:28px;display:flex;flex-direction:column;gap:14px">
+        <h3 style="font-size:20px">{{ tokenTitle }}</h3>
+        <p class="muted" style="font-size:13px;line-height:1.6">{{ tokenHint }}</p>
+        <input class="input" type="password" value="{{ tokenInput }}" onInput="{{ onToken }}" placeholder="{{ tokenPh }}">
+        <sc-if value="{{ tokenError }}" hint-placeholder-val="{{ false }}"><p style="color:var(--sale);font-size:12px">{{ tokenError }}</p></sc-if>
+        <button onClick="{{ saveToken }}" class="btn btn-primary" style="cursor:pointer">{{ saveTokenBtn }}</button>
+      </div>
+    </sc-if>
+
+    <!-- Buyurtmalar ro'yxati -->
+    <sc-if value="{{ hasToken }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+        <p class="muted" style="text-align:center;padding:40px 0">{{ loadingLabel }}</p>
+      </sc-if>
+      <sc-if value="{{ ordersEmpty }}" hint-placeholder-val="{{ false }}">
+        <p class="muted" style="text-align:center;padding:40px 0">{{ emptyLabel }}</p>
+      </sc-if>
+      <sc-if value="{{ hasOrders }}" hint-placeholder-val="{{ true }}">
+        <div style="background:var(--surface);border:1px solid var(--line);overflow-x:auto">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>{{ hOrder }}</th>
+                <th>{{ hCustomer }}</th>
+                <th>{{ hItems }}</th>
+                <th style="text-align:right">{{ hTotal }}</th>
+                <th>{{ hStatus }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <sc-for list="{{ orders }}" as="o" hint-placeholder-count="3">
+                <tr>
+                  <td>
+                    <div style="font-weight:500">#{{ o.id }}</div>
+                    <div class="muted" style="font-size:11.5px">{{ o.date }}</div>
+                  </td>
+                  <td>
+                    <div>{{ o.name }}</div>
+                    <div class="muted" style="font-size:11.5px">{{ o.phone }}</div>
+                    <div class="muted" style="font-size:11.5px">{{ o.city }}</div>
+                  </td>
+                  <td style="font-size:12.5px">
+                    <sc-for list="{{ o.items }}" as="it" hint-placeholder-count="2">
+                      <div style="margin-bottom:4px">{{ it.title }} × {{ it.qty }} <span class="muted">({{ it.priceStr }})</span></div>
+                    </sc-for>
+                  </td>
+                  <td style="text-align:right;font-weight:500;white-space:nowrap">{{ o.totalStr }}</td>
+                  <td>
+                    <span class="adm-status {{ o.statusClass }}">{{ o.statusLabel }}</span>
+                    <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+                      <sc-for list="{{ o.actions }}" as="a" hint-placeholder-count="2">
+                        <button onClick="{{ a.onClick }}" class="btn btn-ghost" style="padding:4px 8px;font-size:11px;border:1px solid var(--line-2);cursor:pointer">{{ a.label }}</button>
+                      </sc-for>
+                    </div>
+                  </td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <div style="margin-top:36px;display:flex;gap:10px;flex-wrap:wrap">
+      <a href="Home.dc.html" class="btn btn-secondary">{{ backBtn }}</a>
+      <button onClick="{{ logoutMode }}" class="btn btn-ghost" style="border:1px solid var(--line-2);cursor:pointer">{{ logoutBtn }}</button>
     </div>
   </div>
 
@@ -37,28 +114,128 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
+  state = { token: "", tokenInput: "", tokenError: "", orders: null, loadError: "" };
   lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
   componentDidMount() {
     this._lh = () => this.forceUpdate();
     window.addEventListener("suf-lang", this._lh);
     try { localStorage.setItem("suf_admin", "1"); } catch (e) {}
+    let token = "";
+    try { token = localStorage.getItem("suf_admin_token") || ""; } catch (e) {}
+    if (token) { this.setState({ token }); this._loadOrders(token); }
   }
   componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+
+  _loadOrders(token) {
+    this.setState({ orders: null, loadError: "" });
+    fetch("/api/admin/orders", { headers: { "x-admin-token": token } })
+      .then(r => r.json().then(j => ({ status: r.status, body: j })))
+      .then(({ status, body }) => {
+        if (status !== 200) {
+          if (status === 401) {
+            try { localStorage.removeItem("suf_admin_token"); } catch (e) {}
+            this.setState({ token: "", tokenError: this.lang() === "ru" ? "Неверный токен" : "Token noto'g'ri" });
+            return;
+          }
+          this.setState({ loadError: (body && body.error) || "server_error", orders: [] });
+          return;
+        }
+        this.setState({ orders: Array.isArray(body.items) ? body.items : [] });
+      })
+      .catch(() => this.setState({ loadError: "network", orders: [] }));
+  }
+
+  _updateStatus(orderId, status) {
+    if (!this.state.token) return;
+    fetch("/api/admin/orders/" + orderId, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-admin-token": this.state.token },
+      body: JSON.stringify({ status })
+    }).then(() => this._loadOrders(this.state.token)).catch(() => {});
+  }
+
+  onToken(e) { this.setState({ tokenInput: e.target.value.trim(), tokenError: "" }); }
+  saveToken() {
+    const t = this.state.tokenInput;
+    if (!t) { this.setState({ tokenError: this.lang() === "ru" ? "Введите токен" : "Tokenni kiriting" }); return; }
+    try { localStorage.setItem("suf_admin_token", t); } catch (e) {}
+    this.setState({ token: t, tokenInput: "", tokenError: "" });
+    this._loadOrders(t);
+  }
+  logoutToken() {
+    try { localStorage.removeItem("suf_admin_token"); } catch (e) {}
+    this.setState({ token: "", orders: null, tokenInput: "", tokenError: "" });
+  }
+  logoutMode() {
+    try { localStorage.removeItem("suf_admin"); localStorage.removeItem("suf_admin_token"); } catch (e) {}
+    window.location.href = "Home.dc.html";
+  }
+  reload() { if (this.state.token) this._loadOrders(this.state.token); }
+
+  _fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+
   renderVals() {
     const R = this.lang() === "ru";
+    const cur = R ? " сум" : " so'm";
+    const statusLabels = R
+      ? { new: "Новый", processing: "В обработке", shipped: "Отправлен", done: "Выполнен", cancelled: "Отменён" }
+      : { new: "Yangi", processing: "Ishlanmoqda", shipped: "Jo'natildi", done: "Bajarildi", cancelled: "Bekor qilindi" };
+    const nextStatuses = { new: "processing", processing: "shipped", shipped: "done" };
+    const actionLabel = R
+      ? { processing: "→ Ishga olish", shipped: "→ Jo'natish", done: "→ Bajarildi", cancelled: "✕ Bekor" }
+      : { processing: "→ Ishga olish", shipped: "→ Jo'natish", done: "→ Bajarildi", cancelled: "✕ Bekor" };
+    const orders = (this.state.orders || []).map((o) => {
+      const items = (o.items || []).map((it) => ({
+        title: it.title, qty: it.qty,
+        priceStr: this._fmt(it.price) + cur,
+      }));
+      const st = statusLabels[o.status] ? o.status : "new";
+      const actions = [];
+      const nxt = nextStatuses[st];
+      if (nxt) actions.push({ label: actionLabel[nxt], onClick: () => this._updateStatus(o.id, nxt) });
+      if (st !== "cancelled" && st !== "done") actions.push({ label: actionLabel.cancelled, onClick: () => this._updateStatus(o.id, "cancelled") });
+      return {
+        id: o.id,
+        date: new Date(o.created_at).toLocaleString(R ? "ru-RU" : "uz-UZ"),
+        name: o.customer_name, phone: o.customer_phone, city: o.city || "",
+        items,
+        totalStr: this._fmt(o.total) + cur,
+        statusLabel: statusLabels[st],
+        statusClass: st,
+        actions,
+      };
+    });
     return {
       kicker: R ? "Только для персонала" : "Faqat xodimlar uchun",
-      title: R ? "Админ-панель" : "Admin panel",
-      body: R
-        ? "Раздел управления магазином. Содержимое определим позже — сюда добавим товары, заказы и статистику."
-        : "Do'konni boshqarish bo'limi. Bu yerga nimalar bo'lishini keyinroq belgilaymiz — mahsulotlar, buyurtmalar va statistika qo'shiladi.",
-      t1: R ? "Товары" : "Mahsulotlar",
-      t2: R ? "Заказы" : "Buyurtmalar",
-      t3: R ? "Статистика" : "Statistika",
-      t4: R ? "Скидки" : "Chegirmalar",
+      title: R ? "Заказы" : "Buyurtmalar",
+      tokenTitle: R ? "Требуется токен админа" : "Admin token talab qilinadi",
+      tokenHint: R ? "Введите ADMIN_TOKEN из настроек сервера. Он сохранится в этом браузере." : "Server sozlamalaridan ADMIN_TOKEN ni kiriting. U shu brauzerda saqlanadi.",
+      tokenPh: R ? "Токен" : "Token",
+      tokenInput: this.state.tokenInput,
+      tokenError: this.state.tokenError,
+      onToken: (e) => this.onToken(e),
+      saveToken: () => this.saveToken(),
+      saveTokenBtn: R ? "Сохранить" : "Saqlash",
+      hasToken: !!this.state.token,
+      needToken: !this.state.token,
+      isLoading: !!this.state.token && this.state.orders === null,
+      loadingLabel: R ? "Загрузка…" : "Yuklanmoqda…",
+      ordersEmpty: !!this.state.token && Array.isArray(this.state.orders) && this.state.orders.length === 0,
+      hasOrders: !!this.state.token && Array.isArray(this.state.orders) && this.state.orders.length > 0,
+      emptyLabel: R ? "Заказов пока нет" : "Hali buyurtmalar yo'q",
+      orders,
+      hOrder: R ? "Заказ" : "Buyurtma",
+      hCustomer: R ? "Клиент" : "Mijoz",
+      hItems: R ? "Товары" : "Mahsulotlar",
+      hTotal: R ? "Итого" : "Jami",
+      hStatus: R ? "Статус" : "Status",
+      reload: () => this.reload(),
+      reloadBtn: R ? "Обновить" : "Yangilash",
+      logoutToken: () => this.logoutToken(),
+      clearToken: R ? "Сменить токен" : "Tokenni o'zgartirish",
       backBtn: R ? "На главную" : "Bosh sahifaga",
+      logoutMode: () => this.logoutMode(),
       logoutBtn: R ? "Выйти из админ-режима" : "Admin rejimidan chiqish",
-      logout: () => { try { localStorage.removeItem("suf_admin"); } catch (e) {} window.location.href = "Home.dc.html"; },
     };
   }
 }

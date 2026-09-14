@@ -38,21 +38,51 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
+  state = { dbProducts: null };
   lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
-  componentDidMount() { this._lh = () => this.forceUpdate(); window.addEventListener("suf-lang", this._lh); }
+  componentDidMount() {
+    this._lh = () => this.forceUpdate();
+    window.addEventListener("suf-lang", this._lh);
+    fetch("/api/products").then(r => r.json()).then(res => {
+      this.setState({ dbProducts: Array.isArray(res.items) ? res.items : [] });
+    }).catch(() => this.setState({ dbProducts: [] }));
+  }
   componentWillUnmount() { window.removeEventListener("suf-lang", this._lh); }
+  _fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+  _discountPct(oldP, newP) { if (!oldP || !newP || oldP <= newP) return 0; return Math.round((1 - newP / oldP) * 100); }
   renderVals() {
     const R = this.lang() === "ru";
     const P = (uz, ru) => (R ? ru : uz);
+    const staticFallback = [
+      { id: "sale-ch1", img: "assets/marca-giovanni.jpg", title: "Marca Giovanni", sizeLabel: P("Turkiya · Qutisiz · Ko'rpajild 200/220", "Турция · Без коробки"), price: "600 000", oldPrice: "900 000", rating: 5, tags: [{ label: "-30%", type: "sale" }], colors: [] },
+    ];
+    const db = this.state.dbProducts;
+    let products;
+    if (db) {
+      products = db.filter((p) => p.old_price && Number(p.old_price) > Number(p.price)).map((p) => {
+        const pct = this._discountPct(Number(p.old_price), Number(p.price));
+        return {
+          id: p.id,
+          img: (p.images && p.images[0]) || "",
+          title: R ? (p.title_ru || p.title_uz) : (p.title_uz || p.title_ru),
+          sizeLabel: (p.sizes && p.sizes[0]) ? (R ? "Размер: " : "O'lcham: ") + p.sizes[0] : "",
+          price: this._fmt(p.price),
+          oldPrice: this._fmt(p.old_price),
+          rating: p.rating || 5,
+          tags: [{ label: "-" + pct + "%", type: "sale" }].concat((p.tags || []).map((t) => ({ label: t, type: t.toLowerCase() === "hot" ? "hot" : "outline" }))),
+          colors: p.colors || [],
+          tall: p.category === "liboslar" || p.category === "poyabzal",
+        };
+      });
+      if (products.length === 0) products = staticFallback;
+    } else {
+      products = staticFallback;
+    }
     return {
       kicker: R ? "Специальные цены" : "Maxsus narxlar",
       title: R ? "Товары со скидкой" : "Chegirmadagi mahsulotlar",
       subtitle: R ? "Скидки на выбранные товары из Турции. Количество ограничено." : "Turkiyadan kelgan tanlangan mahsulotlarga chegirma. Miqdor cheklangan.",
-      products: [
-        { id: "sale-ch1", img: "assets/marca-giovanni.jpg", title: "Marca Giovanni", sizeLabel: P("Turkiya · Qutisiz · Ko'rpajild 200/220, prostinya 240/260, 2 yostiqjild 50/70", "Турция · Без коробки · Пододеяльник 200/220, простыня 240/260, 2 наволочки 50/70"), price: "600 000", oldPrice: "900 000", rating: 5, tags: [{ label: "-30%", type: "sale" }, { label: R ? "Осталось 1 шт" : "1 dona qoldi", type: "hot" }], colors: ["#1C1C1C", "#C0392B"] },
-        { id: "sale-p2", img: "assets/sharmiel.jpg", title: "Şarmiel", sizeLabel: P("O'lcham: 40 · faqat 1 dona", "Размер: 40 · только 1 шт"), price: "150 000", oldPrice: "214 000", rating: 5, tags: [{ label: "-30%", type: "sale" }, { label: R ? "Осталось 1 шт" : "1 dona qoldi", type: "hot" }], colors: [] },
-        { id: "sale-l4", img: "assets/daffic.jpg", title: "Daffic", tall: true, sizes: ["42"], price: "630 000", oldPrice: "700 000", rating: 5, tags: [{ label: "-10%", type: "sale" }], colors: [] },
-      ],
+      products,
     };
   }
 }
