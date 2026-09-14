@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { query, hasDb } from "../db.js";
+import { notifyOrder } from "../lib/notify.js";
 
 const router = Router();
 
@@ -52,6 +53,7 @@ router.post("/", async (req, res, next) => {
         created_at: new Date().toISOString(),
       };
       memOrders.push(row);
+      notifyOrder(row).then((r) => console.log("[notify]", JSON.stringify(r))).catch((e) => console.warn("[notify] err", e.message));
       return res.json({ ok: true, order: row });
     }
 
@@ -93,7 +95,10 @@ router.post("/", async (req, res, next) => {
         );
       }
       await client.query("COMMIT");
-      res.json({ ok: true, order: { ...orderRow, items: normalized } });
+      const fullOrder = { ...orderRow, items: normalized };
+      // Notify — fire and forget, javobga to'sqinlik qilmasin
+      notifyOrder(fullOrder).then((r) => console.log("[notify]", JSON.stringify(r))).catch((e) => console.warn("[notify] err", e.message));
+      res.json({ ok: true, order: fullOrder });
     } catch (e) {
       await client.query("ROLLBACK");
       throw e;

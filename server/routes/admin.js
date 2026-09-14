@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { query, hasDb } from "../db.js";
+import { config as notifyConfig, tgFetchUpdates, notifyOrder } from "../lib/notify.js";
 
 const router = Router();
 
@@ -58,6 +59,36 @@ router.patch("/orders/:id", requireAdmin, async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+});
+
+// Notify konfiguratsiyasi qanday ekanligini ko'rish (sirlarsiz)
+router.get("/notify-status", requireAdmin, (_req, res) => {
+  res.json(notifyConfig);
+});
+
+// Bot getUpdates — chat_id topish uchun (kim /start bosgan)
+router.get("/tg-updates", requireAdmin, async (_req, res) => {
+  const j = await tgFetchUpdates();
+  res.json(j);
+});
+
+// Sinov: buyurtmadek namuna xabarni jo'natish (integratsiyani tekshirish uchun)
+router.post("/notify-test", requireAdmin, async (_req, res) => {
+  const fake = {
+    id: "TEST",
+    customer_name: "Sinov buyurtmasi",
+    customer_phone: "+998911919178",
+    city: "Toshkent",
+    address: "Chilonzor, 3-uy",
+    subtotal: 690000,
+    delivery_fee: 30000,
+    total: 720000,
+    status: "new",
+    created_at: new Date().toISOString(),
+    items: [{ title: "Test mahsulot", size: "40", price: 690000, qty: 1 }],
+  };
+  const r = await notifyOrder(fake);
+  res.json({ ok: true, result: r });
 });
 
 export default router;
