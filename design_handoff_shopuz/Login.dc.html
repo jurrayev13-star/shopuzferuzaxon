@@ -113,9 +113,19 @@ class Component extends DCLogic {
     const d = this.digits(this.state.phone);
     if (d.length < 9) { this.setState({ phoneError: R ? "Введите 9 цифр номера" : "Raqamning 9 ta raqamini kiriting" }); return; }
     if (this.state.mode === "register" && !this.state.name.trim()) { this.setState({ phoneError: R ? "Введите имя" : "Ismingizni kiriting" }); return; }
-    const demo = String(Math.floor(10000 + Math.random() * 90000));
-    this.setState({ step: "code", demo, code: ["", "", "", "", ""], phoneError: "", codeError: "" });
-    setTimeout(() => { if (this.refs[0]) this.refs[0].focus(); }, 30);
+    const phone = "+998" + d;
+    fetch("/api/auth/send-code", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone })
+    }).then(r => r.json()).then(res => {
+      if (!res || !res.ok) { this.setState({ phoneError: R ? "Ошибка отправки кода" : "Kod jo'natishda xatolik" }); return; }
+      this.setState({ step: "code", demo: res.demoCode || "", code: ["", "", "", "", ""], phoneError: "", codeError: "" });
+      setTimeout(() => { if (this.refs[0]) this.refs[0].focus(); }, 30);
+    }).catch(() => {
+      const demo = String(Math.floor(10000 + Math.random() * 90000));
+      this.setState({ step: "code", demo, code: ["", "", "", "", ""], phoneError: "", codeError: "" });
+      setTimeout(() => { if (this.refs[0]) this.refs[0].focus(); }, 30);
+    });
   }
   onCode(e) {
     const idx = parseInt(e.target.getAttribute("data-idx"), 10);
@@ -133,11 +143,33 @@ class Component extends DCLogic {
     const R = this.lang() === "ru";
     const entered = this.state.code.join("");
     if (entered.length < 5) { this.setState({ codeError: R ? "Введите 5-значный код" : "5 xonali kodni kiriting" }); return; }
-    if (entered !== this.state.demo) { this.setState({ codeError: R ? "Неверный код, попробуйте снова" : "Kod noto'g'ri, qayta urinib ko'ring" }); return; }
-    const user = { name: this.state.name.trim() || (R ? "Mijoz" : "Mijoz"), phone: "+998" + this.digits(this.state.phone) };
-    try { localStorage.setItem("suf_user", JSON.stringify(user)); } catch (e) {}
-    window.dispatchEvent(new CustomEvent("suf-auth"));
-    window.location.href = "Home.dc.html";
+    const phone = "+998" + this.digits(this.state.phone);
+    const name = this.state.name.trim() || null;
+    fetch("/api/auth/verify", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, code: entered, name })
+    }).then(r => r.json().then(j => ({ status: r.status, body: j })))
+      .then(({ status, body }) => {
+        if (status !== 200 || !body.ok) {
+          const msg = body && body.error === "wrong_code"
+            ? (R ? "Неверный код, попробуйте снова" : "Kod noto'g'ri, qayta urinib ko'ring")
+            : (R ? "Ошибка проверки кода" : "Kodni tekshirishda xatolik");
+          this.setState({ codeError: msg });
+          return;
+        }
+        const user = { name: body.user.name || (R ? "Клиент" : "Mijoz"), phone: body.user.phone };
+        try { localStorage.setItem("suf_user", JSON.stringify(user)); } catch (e) {}
+        if (body.user.is_admin) { try { localStorage.setItem("suf_admin", "1"); } catch (e) {} }
+        window.dispatchEvent(new CustomEvent("suf-auth"));
+        window.location.href = "Home.dc.html";
+      })
+      .catch(() => {
+        if (entered !== this.state.demo) { this.setState({ codeError: R ? "Неверный код, попробуйте снова" : "Kod noto'g'ri, qayta urinib ko'ring" }); return; }
+        const user = { name: this.state.name.trim() || (R ? "Клиент" : "Mijoz"), phone };
+        try { localStorage.setItem("suf_user", JSON.stringify(user)); } catch (e) {}
+        window.dispatchEvent(new CustomEvent("suf-auth"));
+        window.location.href = "Home.dc.html";
+      });
   }
   backToPhone() { this.setState({ step: "phone", codeError: "" }); }
   resend(e) { if (e && e.preventDefault) e.preventDefault(); this.sendCode(); }

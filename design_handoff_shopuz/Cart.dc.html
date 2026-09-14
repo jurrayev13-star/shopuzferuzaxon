@@ -65,8 +65,9 @@
               <span style="font-size:15px">{{ totalLabel }}</span>
               <span style="font-family:var(--serif);font-weight:500;font-size:26px">{{ totalStr }} <span style="font-size:14px;font-family:var(--sans)">{{ som }}</span></span>
             </div>
-            <a href="#" class="btn btn-primary btn-block" style="padding:16px">{{ checkoutBtn }}</a>
+            <button onClick="{{ checkout }}" class="btn btn-primary btn-block" style="padding:16px;border:none;cursor:pointer">{{ checkoutBtn }}</button>
             <p class="muted" style="font-size:11.5px;text-align:center;line-height:1.6">{{ note }}</p>
+            <sc-if value="{{ orderStatus }}" hint-placeholder-val="{{ false }}"><p style="text-align:center;font-size:13px;color:var(--accent);margin-top:6px">{{ orderStatus }}</p></sc-if>
           </div>
         </aside>
       </div>
@@ -78,6 +79,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
+  state = { orderStatus: "" };
   lang() { try { return localStorage.getItem("suf_lang") || "uz"; } catch (e) { return "uz"; } }
   readCart() { try { return JSON.parse(localStorage.getItem("suf_cart") || "[]"); } catch (e) { return []; } }
   writeCart(c) { try { localStorage.setItem("suf_cart", JSON.stringify(c)); } catch (e) {} window.dispatchEvent(new CustomEvent("suf-cart")); this.forceUpdate(); }
@@ -107,6 +109,31 @@ class Component extends DCLogic {
     const totalQty = cart.reduce((s, x) => s + x.qty, 0);
     const subtotal = cart.reduce((s, x) => s + x.price * x.qty, 0);
     const delivery = cart.length ? 30000 : 0;
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem("suf_user") || "null"); } catch (e) {}
+    const checkout = () => {
+      if (cart.length === 0) return;
+      if (!user) {
+        try { localStorage.setItem("suf_return_to", "Cart.dc.html"); } catch (e) {}
+        window.location.href = "Login.dc.html";
+        return;
+      }
+      this.setState({ orderStatus: R ? "Отправка заказа…" : "Buyurtma yuborilyapti…" });
+      fetch("/api/orders", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: user.name, customer_phone: user.phone,
+          city: "Toshkent", delivery_fee: delivery,
+          items: cart.map((x) => ({ id: x.key, title: x.title, price: x.price, qty: x.qty, size: x.size || null, image: x.img || null }))
+        })
+      }).then((r) => r.json()).then((res) => {
+        if (!res || !res.ok) throw new Error("order_failed");
+        this.writeCart([]);
+        this.setState({ orderStatus: R ? "Заказ отправлен! Мы свяжемся с вами." : "Buyurtma qabul qilindi! Tez orada bog'lanamiz." });
+      }).catch(() => {
+        this.setState({ orderStatus: R ? "Не удалось оформить заказ" : "Buyurtma jo'natilmadi" });
+      });
+    };
     return {
       title: R ? "Корзина" : "Savat",
       countLabel: R ? totalQty + " товаров" : totalQty + " ta mahsulot",
@@ -125,6 +152,8 @@ class Component extends DCLogic {
       som: cur,
       checkoutBtn: R ? "Оформить заказ" : "Rasmiylashtirish",
       note: R ? "Для оформления заказа требуется вход. Корзина сохранится." : "Buyurtma berish uchun tizimga kirish talab qilinadi. Savat saqlanadi.",
+      checkout,
+      orderStatus: this.state && this.state.orderStatus,
       items: cart.map((it) => ({
         title: it.title,
         img: it.img || "",
