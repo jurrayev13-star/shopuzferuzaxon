@@ -105,4 +105,36 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+router.get("/mine", async (req, res, next) => {
+  try {
+    const phone = String(req.query.phone || "").trim();
+    if (!phone) return res.status(400).json({ error: "phone_required" });
+    if (!hasDb()) {
+      return res.json({ items: memOrders.filter((o) => o.customer_phone === phone) });
+    }
+    const { rows: orders } = await query(
+      `SELECT id, customer_name, customer_phone, address, city, delivery_fee,
+              subtotal, total, status, note, created_at
+       FROM orders WHERE customer_phone = $1 ORDER BY created_at DESC LIMIT 50`,
+      [phone]
+    );
+    const ids = orders.map((o) => o.id);
+    let itemsByOrder = new Map();
+    if (ids.length) {
+      const { rows: items } = await query(
+        `SELECT order_id, product_id, title, price, qty, size, color, image
+         FROM order_items WHERE order_id = ANY($1::bigint[])`,
+        [ids]
+      );
+      for (const it of items) {
+        if (!itemsByOrder.has(it.order_id)) itemsByOrder.set(it.order_id, []);
+        itemsByOrder.get(it.order_id).push(it);
+      }
+    }
+    res.json({ items: orders.map((o) => ({ ...o, items: itemsByOrder.get(o.id) || [] })) });
+  } catch (e) {
+    next(e);
+  }
+});
+
 export default router;

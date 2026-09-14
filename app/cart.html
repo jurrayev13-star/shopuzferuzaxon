@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Savat · Shop Uz Feruzaxon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/logo.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<main class="page" id="page-root"></main>
+<script src="/js/app.js"></script>
+<script>
+(function () {
+  const S = window.SUF;
+  S.mountChrome({ active: "cart", title: S.t("cart") });
+  const root = document.getElementById("page-root");
+
+  function draw() {
+    const items = S.store.cart();
+    if (items.length === 0) {
+      root.innerHTML = `
+        <div class="empty" style="padding-top:80px">
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="10" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+          <h3>${S.t("empty_cart")}</h3>
+          <a class="btn btn-primary mt-16" href="catalog.html">${S.t("start_shopping")}</a>
+        </div>
+      `;
+      return;
+    }
+    const subtotal = S.cart.subtotal();
+    const delivery = 30000;
+    const total = subtotal + delivery;
+    root.innerHTML = `
+      <div id="lines">
+        ${items.map((it, i) => `
+          <div class="cart-line" data-key="${it.key}">
+            <div class="c-img">${it.img ? `<img src="${it.img}" alt="">` : ""}</div>
+            <div>
+              <div class="c-title">${it.title || ""}</div>
+              ${it.size ? `<div class="c-sub">${S.t("size")}: ${it.size}</div>` : ""}
+              <div class="c-price">${S.fmtPrice(it.price)}</div>
+              <div class="c-qty">
+                <button data-act="dec">−</button>
+                <span>${it.qty}</span>
+                <button data-act="inc">+</button>
+              </div>
+            </div>
+            <button class="c-remove" data-act="rm" aria-label="${S.t("remove")}">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        `).join("")}
+      </div>
+      <div class="mt-24">
+        <div class="summary-row"><span class="muted">${S.t("subtotal")} (${S.cart.count()})</span><span>${S.fmtPrice(subtotal)}</span></div>
+        <div class="summary-row"><span class="muted">${S.t("delivery_fee")}</span><span>${S.fmtPrice(delivery)}</span></div>
+        <div class="summary-row total"><span>${S.t("total")}</span><span>${S.fmtPrice(total)}</span></div>
+      </div>
+      <div class="sticky-cta">
+        <button class="btn btn-primary btn-block" id="checkout-btn">${S.t("checkout")} · ${S.fmtPrice(total)}</button>
+      </div>
+      <p id="cart-msg" class="mt-16 text-center f-13 muted"></p>
+    `;
+    // Handlers
+    root.querySelectorAll(".cart-line").forEach(line => {
+      const key = line.getAttribute("data-key");
+      const it = S.store.cart().find(x => x.key === key);
+      if (!it) return;
+      line.querySelector('[data-act="inc"]').addEventListener("click", () => { S.cart.setQty(key, it.qty + 1); });
+      line.querySelector('[data-act="dec"]').addEventListener("click", () => { S.cart.setQty(key, it.qty - 1); });
+      line.querySelector('[data-act="rm"]').addEventListener("click", () => { S.cart.remove(key); });
+    });
+    document.getElementById("checkout-btn").addEventListener("click", checkout);
+  }
+
+  async function checkout() {
+    const user = S.store.user();
+    if (!user) {
+      S.store.setReturnTo("cart.html");
+      location.href = "auth.html";
+      return;
+    }
+    const items = S.store.cart();
+    if (!items.length) return;
+    const msg = document.getElementById("cart-msg");
+    msg.textContent = S.t("loading");
+    const { ok, body } = await S.API.createOrder({
+      customer_name: user.name || S.t("guest"),
+      customer_phone: user.phone,
+      city: "Toshkent",
+      delivery_fee: 30000,
+      items: items.map(x => ({ id: x.id, title: x.title, price: x.price, qty: x.qty, size: x.size || null, image: x.img || null })),
+    });
+    if (ok && body && body.ok) {
+      S.cart.clear();
+      S.haptics("success");
+      root.innerHTML = `
+        <div class="empty" style="padding-top:80px">
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <h3>${S.t("checkout_success")}</h3>
+          <a class="btn btn-primary mt-16" href="index.html">${S.t("home")}</a>
+        </div>
+      `;
+    } else {
+      S.haptics("error");
+      msg.textContent = S.t("checkout_fail");
+    }
+  }
+
+  draw();
+  window.addEventListener("suf-cart", draw);
+})();
+</script>
+</body>
+</html>

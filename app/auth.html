@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Kirish · Shop Uz Feruzaxon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/logo.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<main class="page">
+  <div class="tab-bar mt-16">
+    <button id="tab-login" class="active">Kirish</button>
+    <button id="tab-register">Ro'yxatdan o'tish</button>
+  </div>
+  <div id="form-area"></div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+(function () {
+  const S = window.SUF;
+  S.mountChrome({ active: "profile", title: S.t("login"), back: true });
+
+  document.getElementById("tab-login").textContent = S.t("login");
+  document.getElementById("tab-register").textContent = S.t("register");
+
+  const state = {
+    mode: "login",
+    step: "phone", // for register: phone -> code
+    phone: "",
+    name: "",
+    password: "",
+    code: ["", "", "", "", ""],
+    demo: "",
+    err: "",
+    busy: false,
+  };
+
+  document.getElementById("tab-login").onclick = () => { state.mode = "login"; state.step = "phone"; state.err = ""; render(); };
+  document.getElementById("tab-register").onclick = () => { state.mode = "register"; state.step = "phone"; state.err = ""; render(); };
+
+  const area = document.getElementById("form-area");
+
+  function fmtPhone(d) {
+    d = d.slice(0, 9);
+    let out = d.slice(0, 2);
+    if (d.length > 2) out += " " + d.slice(2, 5);
+    if (d.length > 5) out += " " + d.slice(5, 7);
+    if (d.length > 7) out += " " + d.slice(7, 9);
+    return out;
+  }
+  function digitsOnly(s) { return (s || "").replace(/\D/g, ""); }
+
+  function saveUser(u) {
+    S.store.setUser({ name: u.name || S.t("guest"), phone: u.phone });
+    if (u.is_admin) { try { localStorage.setItem("suf_admin", "1"); } catch {} }
+    const rt = S.store.popReturnTo();
+    location.href = rt || "profile.html";
+  }
+
+  async function doLogin() {
+    const d = digitsOnly(state.phone);
+    if (d.length < 9) return setErr(S.t("phone") + " – 9 ta raqam");
+    if (!state.password) return setErr(S.t("password"));
+    state.busy = true; render();
+    const { status, body } = await S.API.login("+998" + d, state.password);
+    state.busy = false;
+    if (status === 200 && body.ok) { S.haptics("success"); return saveUser(body.user); }
+    const map = { not_registered: "Bu raqam ro'yxatdan o'tmagan. Avval ro'yxatdan o'ting.", wrong_password: "Parol noto'g'ri" };
+    setErr(map[body?.error] || "Kirishda xatolik");
+  }
+
+  async function sendCode() {
+    const d = digitsOnly(state.phone);
+    if (d.length < 9) return setErr(S.t("phone") + " – 9 ta raqam");
+    if (!state.name.trim()) return setErr(S.t("name"));
+    state.busy = true; render();
+    const { status, body } = await S.API.sendCode("+998" + d);
+    state.busy = false;
+    if (status === 200 && body.ok) {
+      state.demo = body.demoCode || "";
+      state.code = ["", "", "", "", ""];
+      state.password = "";
+      state.step = "code";
+      state.err = "";
+      render();
+      setTimeout(() => document.querySelector('[data-code-idx="0"]')?.focus(), 30);
+      return;
+    }
+    const map = { already_registered: "Bu raqam ro'yxatda bor. Ro'yxat o'rniga kiring." };
+    setErr(map[body?.error] || "Kod jo'natishda xatolik");
+  }
+
+  async function doRegister() {
+    const entered = state.code.join("");
+    if (entered.length < 5) return setErr("5 xonali kodni kiriting");
+    if (!state.password || state.password.length < 6) return setErr(S.t("min_6"));
+    state.busy = true; render();
+    const { status, body } = await S.API.register({
+      phone: "+998" + digitsOnly(state.phone),
+      code: entered,
+      password: state.password,
+      name: state.name.trim(),
+    });
+    state.busy = false;
+    if (status === 200 && body.ok) { S.haptics("success"); return saveUser(body.user); }
+    const map = { wrong_code: "Kod noto'g'ri", code_expired: "Kod eskirgan, yangisini oling", weak_password: S.t("min_6"), already_registered: "Bu raqam ro'yxatda bor" };
+    setErr(map[body?.error] || "Ro'yxatdan o'tishda xatolik");
+  }
+
+  function setErr(m) { state.err = m; render(); }
+
+  function render() {
+    document.getElementById("tab-login").classList.toggle("active", state.mode === "login");
+    document.getElementById("tab-register").classList.toggle("active", state.mode === "register");
+
+    if (state.mode === "login") {
+      area.innerHTML = `
+        <div class="field">
+          <label>${S.t("phone")}</label>
+          <div class="phone-wrap"><span class="p-prefix">+998</span><input id="in-phone" type="tel" inputmode="numeric" placeholder="90 123 45 67" value="${state.phone}"></div>
+        </div>
+        <div class="field">
+          <label>${S.t("password")}</label>
+          <input id="in-pw" class="input" type="password" placeholder="${S.t("password")}" value="${state.password}">
+        </div>
+        ${state.err ? `<p class="err">${state.err}</p>` : ""}
+        <button id="btn-login" class="btn btn-primary btn-block">${state.busy ? "…" : S.t("login")}</button>
+        <p class="mt-16 text-center f-13 muted">${S.t("no_account")} <a href="#" id="go-reg" style="color:var(--text);border-bottom:1px solid var(--text)">${S.t("register")}</a></p>
+      `;
+      document.getElementById("in-phone").addEventListener("input", (e) => { state.phone = fmtPhone(digitsOnly(e.target.value)); e.target.value = state.phone; state.err = ""; });
+      document.getElementById("in-pw").addEventListener("input", (e) => { state.password = e.target.value; state.err = ""; });
+      document.getElementById("btn-login").onclick = doLogin;
+      document.getElementById("go-reg").onclick = (e) => { e.preventDefault(); state.mode = "register"; state.step = "phone"; state.err = ""; render(); };
+      return;
+    }
+
+    if (state.mode === "register" && state.step === "phone") {
+      area.innerHTML = `
+        <div class="field">
+          <label>${S.t("name")}</label>
+          <input id="in-name" class="input" type="text" placeholder="${S.t("name")}" value="${state.name}">
+        </div>
+        <div class="field">
+          <label>${S.t("phone")}</label>
+          <div class="phone-wrap"><span class="p-prefix">+998</span><input id="in-phone" type="tel" inputmode="numeric" placeholder="90 123 45 67" value="${state.phone}"></div>
+        </div>
+        ${state.err ? `<p class="err">${state.err}</p>` : ""}
+        <button id="btn-send" class="btn btn-primary btn-block">${state.busy ? "…" : S.t("send_code")}</button>
+      `;
+      document.getElementById("in-name").addEventListener("input", (e) => { state.name = e.target.value; state.err = ""; });
+      document.getElementById("in-phone").addEventListener("input", (e) => { state.phone = fmtPhone(digitsOnly(e.target.value)); e.target.value = state.phone; state.err = ""; });
+      document.getElementById("btn-send").onclick = sendCode;
+      return;
+    }
+
+    if (state.mode === "register" && state.step === "code") {
+      area.innerHTML = `
+        <div class="field">
+          <label>${S.t("sms_code")}</label>
+          <div class="code-boxes">
+            ${state.code.map((v, i) => `<input inputmode="numeric" maxlength="1" data-code-idx="${i}" value="${v}">`).join("")}
+          </div>
+          <p class="f-12 muted mt-8">Demo kod: <b style="font-family:var(--serif);letter-spacing:3px">${state.demo}</b></p>
+        </div>
+        <div class="field">
+          <label>${S.t("new_password")}</label>
+          <input id="in-pw" class="input" type="password" placeholder="${S.t("min_6")}" value="${state.password}">
+        </div>
+        ${state.err ? `<p class="err">${state.err}</p>` : ""}
+        <button id="btn-reg" class="btn btn-primary btn-block">${state.busy ? "…" : S.t("register")}</button>
+        <button id="btn-back" class="btn btn-ghost btn-block mt-8">← ${S.t("back")}</button>
+      `;
+      const inputs = area.querySelectorAll("[data-code-idx]");
+      inputs.forEach((inp) => {
+        inp.addEventListener("input", (e) => {
+          const idx = Number(e.target.getAttribute("data-code-idx"));
+          const v = digitsOnly(e.target.value).slice(-1);
+          state.code[idx] = v; e.target.value = v;
+          state.err = "";
+          if (v && idx < 4) inputs[idx + 1]?.focus();
+        });
+        inp.addEventListener("keydown", (e) => {
+          const idx = Number(e.target.getAttribute("data-code-idx"));
+          if (e.key === "Backspace" && !state.code[idx] && idx > 0) inputs[idx - 1]?.focus();
+        });
+      });
+      document.getElementById("in-pw").addEventListener("input", (e) => { state.password = e.target.value; state.err = ""; });
+      document.getElementById("btn-reg").onclick = doRegister;
+      document.getElementById("btn-back").onclick = () => { state.step = "phone"; state.err = ""; render(); };
+      return;
+    }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

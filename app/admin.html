@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Admin · Shop Uz Feruzaxon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/logo.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .adm-order { padding:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); margin-bottom:12px }
+  .adm-status { display:inline-block; padding:3px 10px; font-size:11px; text-transform:uppercase; letter-spacing:.04em; border-radius:4px }
+  .s-new { background:var(--accent-100); color:var(--accent-deep) }
+  .s-processing { background:#fff4e5; color:#8a5a00 }
+  .s-shipped { background:#e5f0ff; color:#1e4a8a }
+  .s-done { background:#eaeaea; color:var(--text-2) }
+  .s-cancelled { background:#fdecec; color:var(--sale) }
+</style>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<main class="page" id="page-root"></main>
+<script src="/js/app.js"></script>
+<script>
+(function () {
+  const S = window.SUF;
+  S.mountChrome({ active: "profile", title: S.t("admin_panel"), back: true });
+  try { localStorage.setItem("suf_admin", "1"); } catch {}
+  const root = document.getElementById("page-root");
+  let token = "";
+  try { token = localStorage.getItem("suf_admin_token") || ""; } catch {}
+  const R = S.store.lang() === "ru";
+
+  if (!token) return renderTokenForm();
+  else load();
+
+  function renderTokenForm(err) {
+    root.innerHTML = `
+      <div class="mt-24">
+        <h1>${S.t("admin_panel")}</h1>
+        <p class="muted mt-8 f-14">${R ? "Введите ADMIN_TOKEN из настроек сервера. Токен сохранится в этом устройстве." : "Server sozlamalaridan ADMIN_TOKEN ni kiriting. Token shu qurilmada saqlanadi."}</p>
+        <div class="field mt-16">
+          <label>${S.t("admin_token")}</label>
+          <input id="in-tok" class="input" type="password" placeholder="${S.t("admin_token")}">
+        </div>
+        ${err ? `<p class="err">${err}</p>` : ""}
+        <button id="btn-save" class="btn btn-primary btn-block">${S.t("save")}</button>
+      </div>
+    `;
+    document.getElementById("btn-save").onclick = () => {
+      const v = document.getElementById("in-tok").value.trim();
+      if (!v) return renderTokenForm(R ? "Введите токен" : "Tokenni kiriting");
+      try { localStorage.setItem("suf_admin_token", v); } catch {}
+      token = v;
+      load();
+    };
+  }
+
+  async function load() {
+    root.innerHTML = `<p class="muted text-center mt-24">${S.t("loading")}</p>`;
+    const { status, body } = await S.API.adminOrders(token);
+    if (status === 401) {
+      try { localStorage.removeItem("suf_admin_token"); } catch {}
+      token = "";
+      return renderTokenForm(R ? "Неверный токен" : "Token noto'g'ri");
+    }
+    const items = (body && body.items) || [];
+    if (items.length === 0) return renderEmpty();
+    renderOrders(items);
+  }
+
+  function renderEmpty() {
+    root.innerHTML = `
+      <div class="empty" style="padding-top:60px">
+        <h3>${R ? "Заказов пока нет" : "Hali buyurtmalar yo'q"}</h3>
+        <div class="mt-16" style="display:flex;gap:8px">
+          <button class="btn btn-secondary" id="btn-reload">${R ? "Обновить" : "Yangilash"}</button>
+          <button class="btn btn-ghost" id="btn-logout">${R ? "Сменить токен" : "Tokenni o'zgartirish"}</button>
+        </div>
+      </div>
+    `;
+    document.getElementById("btn-reload").onclick = load;
+    document.getElementById("btn-logout").onclick = () => { try { localStorage.removeItem("suf_admin_token"); } catch {} token = ""; renderTokenForm(); };
+  }
+
+  function renderOrders(items) {
+    const statusLabels = R
+      ? { new: "Новый", processing: "В обработке", shipped: "Отправлен", done: "Выполнен", cancelled: "Отменён" }
+      : { new: "Yangi", processing: "Ishlanmoqda", shipped: "Jo'natildi", done: "Bajarildi", cancelled: "Bekor qilindi" };
+    const next = { new: "processing", processing: "shipped", shipped: "done" };
+    root.innerHTML = `
+      <div class="flex items-center justify-between mt-16" style="gap:8px">
+        <h2 class="section-title" style="margin:0">${R ? "Заказы" : "Buyurtmalar"} · ${items.length}</h2>
+        <button class="btn btn-sm btn-secondary" id="btn-reload">↻</button>
+      </div>
+      <div class="mt-16" id="orders-list">
+        ${items.map(o => `
+          <div class="adm-order" data-id="${o.id}">
+            <div class="flex items-center justify-between" style="gap:8px">
+              <div>
+                <div style="font-weight:600">#${o.id}</div>
+                <div class="muted f-12">${new Date(o.created_at).toLocaleString(R ? "ru-RU" : "uz-UZ")}</div>
+              </div>
+              <span class="adm-status s-${o.status}">${statusLabels[o.status] || o.status}</span>
+            </div>
+            <div class="mt-8">
+              <div style="font-weight:500">${o.customer_name}</div>
+              <div class="muted f-13"><a href="tel:${o.customer_phone}" style="color:var(--accent)">${o.customer_phone}</a> · ${o.city || ""}</div>
+            </div>
+            <div class="mt-8 f-13" style="color:var(--text-2)">
+              ${(o.items || []).map(it => `${it.title} × ${it.qty}`).join(" · ")}
+            </div>
+            <div class="mt-8 flex items-center justify-between">
+              <div style="font-family:var(--serif);font-weight:600;font-size:16px">${S.fmtPrice(o.total)}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                ${next[o.status] ? `<button class="btn btn-sm btn-primary" data-act="advance" data-to="${next[o.status]}">→ ${statusLabels[next[o.status]]}</button>` : ""}
+                ${o.status !== "cancelled" && o.status !== "done" ? `<button class="btn btn-sm btn-secondary" data-act="cancel">${R ? "Отменить" : "Bekor"}</button>` : ""}
+              </div>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+      <div class="mt-16">
+        <button class="btn btn-ghost btn-block" id="btn-logout">${R ? "Сменить токен" : "Tokenni o'zgartirish"}</button>
+      </div>
+    `;
+    document.getElementById("btn-reload").onclick = load;
+    document.getElementById("btn-logout").onclick = () => { try { localStorage.removeItem("suf_admin_token"); } catch {} token = ""; renderTokenForm(); };
+    root.querySelectorAll(".adm-order").forEach(card => {
+      const id = card.getAttribute("data-id");
+      card.querySelector('[data-act="advance"]')?.addEventListener("click", async (e) => {
+        const to = e.target.getAttribute("data-to");
+        await S.API.adminUpdateOrder(id, to, token);
+        load();
+      });
+      card.querySelector('[data-act="cancel"]')?.addEventListener("click", async () => {
+        await S.API.adminUpdateOrder(id, "cancelled", token);
+        load();
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Yetkazish · Shop Uz Feruzaxon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/logo.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<main class="page">
+  <h1 class="mt-16" id="t-title"></h1>
+  <div class="mt-16" id="t-body" style="display:flex;flex-direction:column;gap:16px"></div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+(function () {
+  const S = window.SUF;
+  S.mountChrome({ active: "profile", title: S.t("delivery_info"), back: true });
+  const R = S.store.lang() === "ru";
+  document.getElementById("t-title").textContent = R ? "Доставка" : "Yetkazish";
+  const rows = R
+    ? [
+        { icon: "🇺🇿", title: "По всему Узбекистану", body: "Через BTS Express и FARGO. Оплата за счёт получателя, срок 2–5 дней в зависимости от региона." },
+        { icon: "🛵", title: "Ташкент — курьер", body: "30 000 сум · 1–2 дня. В течение дня наш курьер привезёт заказ по указанному адресу." },
+        { icon: "📞", title: "Оформление", body: "Заказ подтверждается администратором в Telegram или по звонку. Реквизиты появятся после оформления." },
+      ]
+    : [
+        { icon: "🇺🇿", title: "Butun O'zbekiston bo'ylab", body: "BTS Express va FARGO orqali. To'lov qabul qiluvchi hisobiga, muddat 2–5 kun, viloyatga qarab." },
+        { icon: "🛵", title: "Toshkent — kuryer", body: "30 000 so'm · 1–2 kun. Kun davomida bizning kuryerimiz ko'rsatilgan manzilga yetkazadi." },
+        { icon: "📞", title: "Rasmiylashtirish", body: "Buyurtma admin tomonidan Telegram yoki qo'ng'iroq orqali tasdiqlanadi. Rekvizitlar rasmiylashtirilgach yuboriladi." },
+      ];
+  document.getElementById("t-body").innerHTML = rows.map(r => `
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--surface-2);border-radius:var(--radius)">
+      <span style="font-size:26px;line-height:1">${r.icon}</span>
+      <div>
+        <div style="font-weight:600;margin-bottom:4px">${r.title}</div>
+        <div class="muted f-14" style="line-height:1.6">${r.body}</div>
+      </div>
+    </div>
+  `).join("");
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Shop Uz Feruzaxon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="Turkiya liboslari, poyabzallari va atirlari — Shop Uz Feruzaxon">
+<link rel="icon" href="/assets/logo.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<main class="page">
+  <!-- Hero slider -->
+  <section id="hero"></section>
+
+  <!-- Kategoriyalar -->
+  <section class="section">
+    <h2 class="section-title" data-i18n="all_categories">Kategoriyalar</h2>
+    <div class="cat-grid">
+      <a class="cat-tile" href="catalog.html?cat=liboslar">
+        <img src="/assets/libos3.jpg" alt="Liboslar" loading="lazy">
+        <span class="c-name" data-i18n="liboslar">Liboslar</span>
+      </a>
+      <a class="cat-tile" href="catalog.html?cat=poyabzal">
+        <img src="/assets/layki.jpg" alt="Poyabzal" loading="lazy">
+        <span class="c-name" data-i18n="poyabzal">Poyabzal</span>
+      </a>
+      <a class="cat-tile" href="catalog.html?cat=atirlar">
+        <img src="/assets/atir-symphony.jpg" alt="Atirlar" loading="lazy">
+        <span class="c-name" data-i18n="atirlar">Atirlar</span>
+      </a>
+      <a class="cat-tile" href="catalog.html?cat=choyshab">
+        <img src="/assets/marca-giovanni.jpg" alt="Choyshab" loading="lazy">
+        <span class="c-name" data-i18n="choyshab">Choyshab</span>
+      </a>
+      <a class="cat-tile" href="catalog.html?cat=ichki">
+        <img src="/assets/victoria.jpg" alt="Ichki kiyim" loading="lazy">
+        <span class="c-name" data-i18n="ichki">Ichki kiyim</span>
+      </a>
+      <a class="cat-tile" href="chegirma.html">
+        <img src="/assets/daffic.jpg" alt="Sale" loading="lazy">
+        <span class="c-name" data-i18n="sale">Chegirmada</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Promo tiles -->
+  <section class="section">
+    <div class="promo-row">
+      <a class="promo-tile" href="product.html?id=lv-imagination">
+        <img src="/assets/atir-symphony.jpg" alt="LV">
+        <div class="p-body"><strong>Louis Vuitton</strong><span>Imagination</span></div>
+      </a>
+      <a class="promo-tile" href="catalog.html?cat=ichki">
+        <img src="/assets/victoria.jpg" alt="VS">
+        <div class="p-body"><strong>Victoria's Secret</strong><span data-i18n="new_arrivals">yangi kolleksiya</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Tanlangan mahsulotlar -->
+  <section class="section">
+    <h2 class="section-title" data-i18n="featured">Tanlangan</h2>
+    <div class="grid" id="featured-grid"></div>
+    <div class="text-center mt-16">
+      <a href="catalog.html" class="btn btn-secondary" data-i18n="view_more">Ko'proq</a>
+    </div>
+  </section>
+
+  <div class="spacer-lg"></div>
+</main>
+
+<script src="/js/app.js"></script>
+<script>
+(function () {
+  const S = window.SUF;
+  S.mountChrome({ active: "home", title: "Shop Uz Feruzaxon" });
+
+  // Apply i18n texts
+  document.querySelectorAll("[data-i18n]").forEach(n => {
+    const k = n.getAttribute("data-i18n");
+    n.textContent = S.t(k);
+  });
+
+  // Hero slider (3 slides)
+  const heroSlides = [
+    { img: "/assets/libos-hero.jpg", kicker: "liboslar", title: "hero_liboslar_title", sub: "hero_liboslar_sub", href: "catalog.html?cat=liboslar" },
+    { img: "/assets/atir-symphony.jpg", kicker: "atirlar", title: "hero_atirlar_title", sub: "hero_atirlar_sub", href: "catalog.html?cat=atirlar" },
+    { img: "/assets/poyabzal.jpg", kicker: "poyabzal", title: "hero_poyabzal_title", sub: "hero_poyabzal_sub", href: "catalog.html?cat=poyabzal" },
+  ];
+  const hero = document.getElementById("hero");
+  let idx = 0;
+  function drawHero() {
+    const s = heroSlides[idx];
+    hero.innerHTML = `
+      <div class="hero">
+        <img src="${s.img}" alt="">
+        <div class="h-body">
+          <span class="kicker">${S.t(s.kicker)}</span>
+          <h1>${S.t(s.title)}</h1>
+          <p class="muted" style="color:rgba(255,255,255,.85);font-size:14px">${S.t(s.sub)}</p>
+          <a class="btn" href="${s.href}">${S.t("shop_now")}</a>
+        </div>
+        <div class="h-dots">
+          ${heroSlides.map((_, i) => `<span class="h-dot ${i === idx ? "on" : ""}"></span>`).join("")}
+        </div>
+      </div>
+    `;
+  }
+  drawHero();
+  setInterval(() => { idx = (idx + 1) % heroSlides.length; drawHero(); }, 6000);
+
+  // Featured products
+  const grid = document.getElementById("featured-grid");
+  grid.innerHTML = Array.from({ length: 4 }).map(() => S.skeletonCardHtml()).join("");
+  S.API.products({ featured: 1, limit: 8 }).then(({ ok, body }) => {
+    if (!ok || !body || !Array.isArray(body.items) || body.items.length === 0) {
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><p>${S.t("no_products")}</p></div>`;
+      return;
+    }
+    grid.innerHTML = body.items.map(S.productCardHtml).join("");
+  }).catch(() => {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><p>${S.t("no_products")}</p></div>`;
+  });
+})();
+</script>
+</body>
+</html>

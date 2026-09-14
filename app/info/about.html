@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Biz haqimizda · Shop Uz Feruzaxon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/logo.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<main class="page">
+  <div class="mt-16" style="aspect-ratio:4/3;border-radius:var(--radius);overflow:hidden;background:var(--tile)">
+    <img src="/assets/libos-hero.jpg" alt="" style="width:100%;height:100%;object-fit:cover">
+  </div>
+  <h1 class="mt-16" id="t-title"></h1>
+  <div class="mt-16" style="display:flex;flex-direction:column;gap:14px;font-size:15px;line-height:1.7;color:var(--text-2)" id="t-body"></div>
+  <div class="mt-24" style="display:flex;gap:8px;flex-wrap:wrap">
+    <a class="btn btn-primary" href="https://t.me/ShopuzFeruzaxon" target="_blank" rel="noopener">Telegram</a>
+    <a class="btn btn-secondary" href="https://www.instagram.com/shopuzferuzaxon1" target="_blank" rel="noopener">Instagram</a>
+  </div>
+  <div class="spacer-lg"></div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+(function () {
+  const S = window.SUF;
+  S.mountChrome({ active: "profile", title: S.t("about"), back: true });
+  const R = S.store.lang() === "ru";
+  document.getElementById("t-title").textContent = R ? "О нас" : "Biz haqimizda";
+  const body = R
+    ? [
+        "Shop Uz Feruzaxon — с 2016 года мы привозим качественные турецкие платья, обувь, парфюмерию, комплекты постельного белья и нижнее бельё.",
+        "Мы работаем онлайн через Telegram, Instagram и наш сайт. Более 25 000 подписчиков доверяют нам.",
+        "Наша миссия — сделать модные турецкие вещи доступными для каждой семьи в Узбекистане, с заботой и вниманием к каждому клиенту.",
+      ]
+    : [
+        "Shop Uz Feruzaxon — 2016 yildan beri Turkiyadan sifatli liboslar, poyabzallar, atirlar, choyshab to'plamlari va ichki kiyimlarni olib kelamiz.",
+        "Biz onlayn — Telegram, Instagram va saytimiz orqali ishlaymiz. 25 000+ obunachi bizga ishonadi.",
+        "Bizning maqsadimiz — Turkiyadan kelgan zamonaviy narsalarni O'zbekistondagi har bir oilaga hamyonbop qilib yetkazish, har bir mijozga mehr-muhabbat bilan yondashish.",
+      ];
+  document.getElementById("t-body").innerHTML = body.map(p => `<p>${p}</p>`).join("");
+})();
+</script>
+</body>
+</html>

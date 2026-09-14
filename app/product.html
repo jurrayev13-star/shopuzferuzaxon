@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Mahsulot · Shop Uz Feruzaxon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/logo.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<main class="page" id="page-root">
+  <div class="pd-gallery skel" id="gallery"></div>
+  <div id="pd-body" class="pd-info">
+    <div class="skel" style="height:22px; width:70%"></div>
+    <div class="skel" style="height:22px; width:40%"></div>
+  </div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+(function () {
+  const S = window.SUF;
+  const id = new URLSearchParams(location.search).get("id");
+  S.mountChrome({ active: "catalog", title: "", back: true });
+
+  if (!id) {
+    document.getElementById("page-root").innerHTML = `<div class="empty"><h3>${S.t("no_products")}</h3></div>`;
+    return;
+  }
+
+  const gallery = document.getElementById("gallery");
+  const body = document.getElementById("pd-body");
+  let state = { imgIdx: 0, size: null };
+
+  S.API.product(id).then(({ ok, body: p }) => {
+    if (!ok || !p) {
+      document.getElementById("page-root").innerHTML = `<div class="empty"><h3>${S.t("no_products")}</h3></div>`;
+      return;
+    }
+    render(p);
+  }).catch(() => {
+    document.getElementById("page-root").innerHTML = `<div class="empty"><h3>${S.t("no_products")}</h3></div>`;
+  });
+
+  function render(p) {
+    const title = S.pickTitle(p);
+    const desc = S.pickDesc(p);
+    const isSale = p.old_price && Number(p.old_price) > Number(p.price);
+    const images = Array.isArray(p.images) && p.images.length ? p.images : [""];
+    const sizes = Array.isArray(p.sizes) ? p.sizes : [];
+    if (sizes.length > 0) state.size = sizes[0];
+
+    // Gallery
+    function drawGallery() {
+      gallery.classList.remove("skel");
+      const src = images[state.imgIdx] || "";
+      gallery.innerHTML = src ? `<img src="${src}" alt="${title}">` : "";
+    }
+    drawGallery();
+
+    // Body
+    const tags = (p.tags || []).map(tt => {
+      const t = String(tt).toLowerCase();
+      const cls = t === "new" ? "b-new" : t === "hot" ? "b-hot" : t === "sale" ? "b-sale" : "b-new";
+      return `<span class="badge-tag ${cls}">${tt}</span>`;
+    }).join(" ");
+
+    const sizesHtml = sizes.length
+      ? `
+        <div>
+          <div class="f-14" style="color:var(--text-2); margin-bottom:6px">${S.t("size")}</div>
+          <div class="sizes" id="sizes">
+            ${sizes.map(sz => `<button class="${state.size === sz ? "active" : ""}" data-size="${sz}">${sz}</button>`).join("")}
+          </div>
+        </div>
+      `
+      : "";
+
+    const thumbs = images.length > 1
+      ? `<div class="pd-thumbs" id="thumbs">${images.map((im, i) => `<button class="${i === state.imgIdx ? "active" : ""}" data-idx="${i}"><img src="${im}" alt=""></button>`).join("")}</div>`
+      : "";
+
+    body.innerHTML = `
+      ${thumbs}
+      <div style="display:flex; gap:6px; flex-wrap:wrap">${tags}</div>
+      <div class="pd-title">${title}</div>
+      <div class="pd-price">
+        <span class="now ${isSale ? "sale" : ""}">${S.fmtPrice(p.price)}</span>
+        ${isSale ? `<span class="old">${S.fmt(p.old_price)}</span>` : ""}
+      </div>
+      ${sizesHtml}
+      ${desc ? `<p class="pd-desc">${desc}</p>` : ""}
+      <div class="divider"></div>
+      <div class="f-13 muted" style="display:flex;flex-direction:column;gap:8px">
+        <span>• Toshkent bo'ylab kuryer — 30 000 so'm · 1–2 kun</span>
+        <span>• 14 kun ichida bepul qaytarish</span>
+        <span>• Naqd yoki onlayn: Payme · Click · Uzcard</span>
+      </div>
+    `;
+
+    // Sticky bottom CTA
+    const cta = document.createElement("div");
+    cta.className = "sticky-cta";
+    cta.innerHTML = `
+      <button class="btn btn-primary btn-block" id="add-btn">${S.t("add_to_cart")}</button>
+    `;
+    document.getElementById("page-root").appendChild(cta);
+
+    // Wire events
+    if (sizes.length) {
+      const grp = document.getElementById("sizes");
+      grp.addEventListener("click", (e) => {
+        const b = e.target.closest("button[data-size]"); if (!b) return;
+        state.size = b.getAttribute("data-size");
+        grp.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        S.haptics("light");
+      });
+    }
+    if (images.length > 1) {
+      const th = document.getElementById("thumbs");
+      th.addEventListener("click", (e) => {
+        const b = e.target.closest("button[data-idx]"); if (!b) return;
+        state.imgIdx = Number(b.getAttribute("data-idx"));
+        th.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        drawGallery();
+      });
+    }
+    document.getElementById("add-btn").addEventListener("click", () => {
+      S.cart.add({
+        id: p.id,
+        title,
+        price: Number(p.price),
+        img: images[0],
+        size: state.size || null,
+        color: null,
+        qty: 1,
+      });
+      S.toast(S.t("added"));
+    });
+
+    // Telegram main button as alt CTA
+    if (S.tg && S.tg.MainButton) {
+      try {
+        S.tg.MainButton.setText(S.t("add_to_cart"));
+        S.tg.MainButton.onClick(() => document.getElementById("add-btn").click());
+        S.tg.MainButton.show();
+      } catch {}
+    }
+  }
+})();
+</script>
+</body>
+</html>

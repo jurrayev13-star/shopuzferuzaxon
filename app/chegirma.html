@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<title>Chegirma · Shop Uz Feruzaxon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/logo.jpg">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<main class="page">
+  <div class="hero" style="aspect-ratio: 3/1; max-height: 180px; background: linear-gradient(135deg, #1c1c1c, #3a2e2a); margin-top:16px">
+    <div class="h-body" style="background: transparent">
+      <span class="kicker" style="color: var(--gold)">Maxsus narxlar</span>
+      <h1 id="page-title">Chegirmadagi mahsulotlar</h1>
+    </div>
+  </div>
+  <div class="grid mt-16" id="prod-grid"></div>
+  <div class="spacer-lg"></div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+(function () {
+  const S = window.SUF;
+  S.mountChrome({ active: "catalog", title: S.t("sale"), back: true });
+  document.getElementById("page-title").textContent = S.store.lang() === "ru" ? "Товары со скидкой" : "Chegirmadagi mahsulotlar";
+  const grid = document.getElementById("prod-grid");
+  grid.innerHTML = Array.from({ length: 4 }).map(() => S.skeletonCardHtml()).join("");
+  S.API.products().then(({ ok, body }) => {
+    if (!ok || !body) return grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><h3>${S.t("no_products")}</h3></div>`;
+    const items = (body.items || []).filter(p => p.old_price && Number(p.old_price) > Number(p.price));
+    if (items.length === 0) return grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><h3>${S.t("no_products")}</h3></div>`;
+    grid.innerHTML = items.map(S.productCardHtml).join("");
+  });
+})();
+</script>
+</body>
+</html>

@@ -10,7 +10,8 @@ import adminRouter from "./routes/admin.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const PUBLIC_DIR = path.resolve(__dirname, "..", "design_handoff_shopuz");
+const APP_DIR = path.resolve(__dirname, "..", "app");
+const LEGACY_DIR = path.resolve(__dirname, "..", "design_handoff_shopuz");
 
 const app = express();
 app.disable("x-powered-by");
@@ -25,20 +26,23 @@ app.use("/api/auth", authRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/admin", adminRouter);
 
-app.use(
-  express.static(PUBLIC_DIR, {
-    extensions: ["html"],
-    setHeaders(res, filePath) {
-      if (/\.(?:jpg|jpeg|png|webp|gif|svg|woff2?)$/i.test(filePath)) {
-        res.setHeader("Cache-Control", "public, max-age=604800, immutable");
-      } else {
-        res.setHeader("Cache-Control", "no-cache");
-      }
-    },
-  })
-);
+const staticOpts = {
+  extensions: ["html"],
+  setHeaders(res, filePath) {
+    if (/\.(?:jpg|jpeg|png|webp|gif|svg|woff2?)$/i.test(filePath)) {
+      res.setHeader("Cache-Control", "public, max-age=604800, immutable");
+    } else {
+      res.setHeader("Cache-Control", "no-cache");
+    }
+  },
+};
 
-app.get("/", (_req, res) => res.redirect(302, "/Home.dc.html"));
+// Yangi mobile-first app root'da
+app.use(express.static(APP_DIR, staticOpts));
+// Assets — ikkalasi ham bir xil rasm papkasidan foydalanadi
+app.use("/assets", express.static(path.join(LEGACY_DIR, "assets"), staticOpts));
+// Eski dizayn prototipini /legacy/ ostida saqlab qolamiz
+app.use("/legacy", express.static(LEGACY_DIR, staticOpts));
 
 app.use((_req, res) => res.status(404).send("Sahifa topilmadi"));
 
