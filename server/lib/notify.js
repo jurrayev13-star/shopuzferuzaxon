@@ -86,18 +86,41 @@ async function sheetsSend(order) {
       items_json: JSON.stringify(order.items || []),
       note: order.note || "",
     };
-    const res = await fetch(SHEETS_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      redirect: "follow",
-    });
-    if (!res.ok) {
+    // Google Apps Script /exec URL 302 redirect qiladi googleusercontent.com ga.
+    // Node fetch 302 da POST -> GET aylantiradi va body yo'qoladi.
+    // Shuning uchun redirectni qo'lda kuzatib, POST'ni saqlab qolamiz.
+    let url = SHEETS_URL;
+    let body = JSON.stringify(payload);
+    for (let hop = 0; hop < 5; hop++) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+        redirect: "manual",
+      });
+      if (res.status >= 300 && res.status < 400) {
+        const loc = res.headers.get("location");
+        if (!loc) return { ok: false, error: "redirect_no_location" };
+        url = new URL(loc, url).toString();
+        continue;
+      }
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.warn("[sheets] http", res.status, text.slice(0, 200));
+        return { ok: false, error: `http_${res.status}` };
+      }
       const text = await res.text().catch(() => "");
-      console.warn("[sheets] http", res.status, text.slice(0, 200));
-      return { ok: false, error: `http_${res.status}` };
+      // Apps Script JSON qaytaradi: {"ok":true,"id":...}
+      try {
+        const json = JSON.parse(text);
+        if (json && json.ok === false) return { ok: false, error: json.error || "sheets_error" };
+        return { ok: true, response: json };
+      } catch {
+        // JSON emas — HTML sahifa qaytdi, muhtamalan ruxsat yo'q
+        return { ok: false, error: "non_json_response", preview: text.slice(0, 200) };
+      }
     }
-    return { ok: true };
+    return { ok: false, error: "too_many_redirects" };
   } catch (e) {
     console.warn("[sheets] error:", e.message);
     return { ok: false, error: e.message };
