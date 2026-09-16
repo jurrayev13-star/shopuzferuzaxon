@@ -381,6 +381,43 @@ window.SUF = { store, cart, t, pickTitle, pickDesc, fmt, fmtPrice, API, mountChr
 // Initial Telegram init
 initTelegram();
 
+// ---------- PWA: service worker + install prompt ----------
+function initPWA() {
+  if (!("serviceWorker" in navigator)) return;
+  // Telegram Mini App ichida service worker registratsiyasidan foyda yo'q — o'tkazamiz
+  if (tg && tg.initData) return;
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch((err) => {
+      console.warn("[pwa] SW registration failed", err);
+    });
+  });
+
+  // beforeinstallprompt (Chrome/Edge/Android) — tugmani ko'rsatamiz
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    window.__sufInstallEvent = e;
+    // agar sahifada install tugma slot bo'lsa — ko'rsatamiz
+    const slot = document.querySelector("[data-install-slot]");
+    if (slot) {
+      slot.hidden = false;
+      slot.addEventListener("click", async () => {
+        try {
+          await e.prompt();
+          const choice = await e.userChoice;
+          if (choice.outcome === "accepted") slot.hidden = true;
+        } catch {}
+      }, { once: true });
+    }
+  });
+
+  window.addEventListener("appinstalled", () => {
+    try { localStorage.setItem("suf_installed", "1"); } catch {}
+    const slot = document.querySelector("[data-install-slot]");
+    if (slot) slot.hidden = true;
+  });
+}
+initPWA();
+
 // Global: language change → reload badge labels are refreshed by page reload elsewhere,
 // but for pages that don't reload, we could re-render. Keep simple: reload.
 window.addEventListener("suf-lang", () => { /* pages handle */ });

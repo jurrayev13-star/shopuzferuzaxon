@@ -29,6 +29,17 @@ app.use("/api/admin", adminRouter);
 const staticOpts = {
   extensions: ["html"],
   setHeaders(res, filePath) {
+    const lower = filePath.toLowerCase();
+    if (lower.endsWith(".webmanifest")) {
+      res.setHeader("Content-Type", "application/manifest+json; charset=utf-8");
+      res.setHeader("Cache-Control", "no-cache");
+      return;
+    }
+    if (lower.endsWith("sw.js") || lower.endsWith("\\sw.js") || lower.endsWith("/sw.js")) {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Service-Worker-Allowed", "/");
+      return;
+    }
     if (/\.(?:jpg|jpeg|png|webp|gif|svg|woff2?)$/i.test(filePath)) {
       res.setHeader("Cache-Control", "public, max-age=604800, immutable");
     } else {
