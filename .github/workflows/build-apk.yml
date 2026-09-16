@@ -1,0 +1,55 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "android/**"
+      - ".github/workflows/build-apk.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute for gradlew
+        working-directory: android
+        run: chmod +x gradlew
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Rename APK
+        working-directory: android
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk ShopUzFeruzaxon-debug.apk
+          ls -la ShopUzFeruzaxon-debug.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShopUzFeruzaxon-debug-apk
+          path: android/ShopUzFeruzaxon-debug.apk
+          retention-days: 30
+
+      - name: Report APK size
+        working-directory: android
+        run: |
+          size=$(du -h ShopUzFeruzaxon-debug.apk | cut -f1)
+          echo "### 📦 APK tayyor" >> $GITHUB_STEP_SUMMARY
+          echo "**Fayl:** ShopUzFeruzaxon-debug.apk" >> $GITHUB_STEP_SUMMARY
+          echo "**Hajm:** $size" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Actions tabidan artifact sifatida yuklab oling." >> $GITHUB_STEP_SUMMARY
